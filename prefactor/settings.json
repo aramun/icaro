@@ -1,0 +1,32 @@
+{
+  "project_name": "myicaroproject",
+  "listen_port": 80,
+  "cache_location" : "~/icaro/",
+  "media": "/media/",
+  "nginx_path":"/etc/nginx/",
+
+  "config_profiles": {
+                      "default": {"proxy_set_header":[
+                                 "Host $http_host",
+                                 "X-Real-IP $remote_addr",
+                                 "X-Forwarded-For $proxy_add_x_forwarded_for",
+                                 "X-Forwarded-Proto $scheme"
+                                 ]
+                      } 
+  },
+
+  "apis" : [
+              {"name":"myapi1","roles":["all"],"addr":"local","config_profile": "default"},
+              {"name":"auth","roles":["all"],"addr":"local","config_profile": "default"}
+  ],
+
+  "pages" : [
+              {"name":"home", "addr":"local","config_profile": "default"}
+  ],
+
+  "db": {
+        "host":"localhost",
+        "user":"root",
+        "psw":""
+  }
+}

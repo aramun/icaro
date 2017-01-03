@@ -1,8 +1,0 @@
-{
-"title":"Home",
-"modules":[
-            {"title":"menu","roles":["all"],"widgets":["menu"]},
-            {"title":"home","roles":["all"],"widgets":["presentation"]},
-            {"title":"footer","roles":["all"],"widgets":["footer"]}
-          ]
-}
