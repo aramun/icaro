@@ -2,6 +2,7 @@ import sys
 import json
 import os
 from core.run import init
+from core.run import delete
 import icaro.utils as utils
 
 sys.path.append(utils.selfLocation())
@@ -24,16 +25,17 @@ def restartProject():
 	init(settings)
 	os.system("service nginx restart")
 
-def resetProject():
+def deleteProject():
 	ans = raw_input("This action will delete all project are you sure?: (y/n)")
 	if ans == "y" or ans == "yes":
 		settings = json.loads(utils.readLines("settings.json"))
-		init(settings)
-	if ans == "n" or ans == "no":
+		delete(settings)
+		return
+	elif ans == "n" or ans == "no":
 		return
 	else:
 		print "Invalid answer!"
-		resetProject()
+		deleteProject()
 
 def commandsManager(command):
 	getattr(sys.modules[__name__], command)()

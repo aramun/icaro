@@ -6,15 +6,7 @@ import re
 import utils
 
 port = 8000
-
-def checkPort(port):
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	result = sock.connect_ex(('127.0.0.1', port))
-	if result == 0:
-		return True
-	else:
-		return False
-		
+	
 def writeProxy(proxy_dir, obj, config_profiles):
 	for elem in obj:
 		config = ""
@@ -30,6 +22,10 @@ def genWidget(name):
 	utils.mkDir("widgets/" + name + "/images")
 	if not os.path.isfile("widgets/" + name + "/index.html"):
 		utils.fileWrite("widgets/" + name + "/index.html","<!-- Write your widget... -->")
+	if not os.path.isfile("widgets/" + name + "/css/style.css"):
+		utils.fileWrite("widgets/" + name + "/css/style.css","//widget css rules...")
+	if not os.path.isfile("widgets/" + name + "/js/main.js"):
+		utils.fileWrite("widgets/" + name + "/js/main.js","//widget javascript code...")
 
 def genFolders():
 	genWidget("mywidget1")
@@ -39,18 +35,19 @@ def genFolders():
 
 
 def runApi(api, port, project_name):
-	os.system("ruby " + utils.selfLocation() + "/start.rb " + api + " " + str(port) + " " + project_name + " " + "api")
+	os.system("ruby " + utils.selfLocation() + "/start.rb " + api + " " + str(port) + " " + project_name + " " + "api " + "run")
 
 def runPage(page, port, project_name):
-	os.system("ruby " + utils.selfLocation() + "/start.rb " + page + " " + str(port) + " " + project_name + " " + "pages")
+	os.system("ruby " + utils.selfLocation() + "/start.rb " + page + " " + str(port) + " " + project_name + " " + "pages "+ "run")
 
 def runApis(settingsApis, project_name):
 	global port
 	apis = []
+	api_obj = {}
 	utils.createFolder("api")
 	for api in settingsApis:
 		if(api["addr"] == "local"):
-			while (checkPort(port)):
+			while (utils.checkPort(port)):
 				port += 1
 			runApi(api["name"], port, project_name)
 			api_obj = {}
@@ -70,9 +67,10 @@ def runPages(settingsPages, project_name):
 	pages = []
 	utils.createFolder("pages")
 	utils.createFolder("widgets")
+	page_obj = {}
 	for page in settingsPages:
 		if(page["addr"] == "local"):
-			while (checkPort(port)):
+			while (utils.checkPort(port)):
 				port += 1
 			runPage(page["name"], port, project_name)
 			page_obj = {}
@@ -87,6 +85,11 @@ def runPages(settingsPages, project_name):
 			page_obj["addr"] = page["addr"]
 	return pages
 
+def portController(port):
+	if utils.checkPort(int(port)):
+		port = raw_input("Port " + port + " seems already in use...insert another port --> ")
+		portController(port)
+
 
 def createApisLocations(string, apis, settings):
 	for api in apis:
@@ -98,7 +101,10 @@ def createApisLocations(string, apis, settings):
 
 def createPagesLocations(string, pages, settings):
 	for page in pages:
-		string += "\r\nlocation /" + page["name"] + "/ {\r\n"
+		string += "\r\nlocation /"
+		if page["name"] != "index": 
+			string += page["name"]
+		string += " {\r\n"
 		string += "\tproxy_pass " + page["addr"] + "/;\r\n"
 		string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + page["name"] +";\r\n"
 		string += "}"
@@ -134,8 +140,17 @@ def proxyConf(settings):
 	writeProxy(proxy_dir, settings["pages"], settings["config_profiles"])
 
 def init(settings):
+	#portController(settings["listen_port"])-> funziona il controllo ma se ricarico il progetto rileva ovviamente che la porta e occupata
 	proxyConf(settings)
 	mkServer(settings, runApis(settings["apis"],settings["project_name"]), runPages(settings["pages"],settings["project_name"]))
 	genFolders()
 	os.system("service nginx restart")
 	os.system("chmod -R 777 .")
+
+def delete(settings):
+	os.system("rm -r *")
+	for api in settings["apis"]:
+		os.system("ruby " + utils.selfLocation() + "/start.rb " + api["name"] + " " + str(settings["listen_port"]) + " " + settings["project_name"] + " api " + "terminate")
+	for page in settings["pages"]:
+		os.system("ruby " + utils.selfLocation() + "/start.rb " + page["name"] + " " + str(settings["listen_port"]) + " " + settings["project_name"] + " page " + "terminate")
+	os.system("service nginx restart")

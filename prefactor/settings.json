@@ -21,7 +21,7 @@
   ],
 
   "pages" : [
-              {"name":"home", "addr":"local","config_profile": "default"}
+              {"name":"index", "addr":"local","config_profile": "default"}
   ],
 
   "db": {

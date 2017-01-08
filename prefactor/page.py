@@ -4,6 +4,7 @@ import os
 import jinja2
 import requests
 import magic
+import icaro.security.page as security
 import icaro.render as render
 import icaro.core.utils as utils
 
@@ -12,8 +13,8 @@ import icaro.core.utils as utils
 #role is the value that exit from your custom auth api
 # a role can be static assigned
 page = [
-	{"role": "all", "widget": "mywidget1"},
-	{"role": "all", "widget": "mywidget2"}
+	{"roles": ["all"], "widget": "mywidget1"},
+	{"roles": ["all"], "widget": "mywidget2"}
 ]
 
 libraries = {
@@ -25,28 +26,49 @@ libraries = {
 		]
 }
 
+def getData():
+	data = {}
+	data["role"] = "all"#-> call at auth api
+	data["username"] = "all"
+	return data
+
+
 class Static:
 	def on_get(self, req, resp, widget, type, file):
-		file = "../widgets/" + widget + "/" + type + "/" +file
-		resp.status = falcon.HTTP_200
-		mime = magic.Magic(mime=True)
-		resp.content_type = mime.from_file(file)
-		resp.body = utils.readLines(file)
+		role = "principal"
+		if security.static(req, page, role, widget):
+			file = "widgets/" + widget + "/" + type + "/" +file
+			resp.status = falcon.HTTP_200
+			mime = magic.Magic(mime=True)
+			resp.content_type = mime.from_file(file)
+			resp.body = utils.readLines(file)
+		else:
+			falcon.HTTP_403
+			resp.body = "Access Denied"
 
 class Lib:
 	def on_get(self, req, resp, type, file):
-		file = "libraries/" + type + "/" + file
-		resp.status = falcon.HTTP_200
-		resp.content_type = mime.from_file(file)
-		resp.body = utils.readLines(file)
+		if security.lib(req):
+			file = "pages/libraries/" + type + "/" + file
+			resp.status = falcon.HTTP_200
+			mime = magic.Magic(mime=True)
+			resp.content_type = mime.from_file(file)
+			resp.body = utils.readLines(file)
+		else:
+			falcon.HTTP_403
+			resp.body = "Access Denied"
 
 class Root:
 	def on_get(self, req, resp):
-		role = "all"
-		template = render.load_template(role, page, libraries)
-		resp.status = falcon.HTTP_200
-		resp.content_type = 'text/html'
-		resp.body = template.render(myvar = "one random")
+		if security.page(req):
+			data = getData()
+			template = render.load_template(data["role"], page, libraries)
+			resp.status = falcon.HTTP_200
+			resp.content_type = 'text/html'
+			resp.body = template.render(data = data)
+		else:
+			falcon.HTTP_403
+			resp.body = "Access Denied"
 
 api = falcon.API()
 api.add_route('/static/{widget}/{type}/{file}', Static())

@@ -6,7 +6,7 @@ obj = ARGV[0]
 port = ARGV[1]
 project = ARGV[2]
 type = ARGV[3]
-
+command = ARGV[4]
 
 def killProcess(pid)
     begin  
@@ -51,7 +51,7 @@ def closeApi(obj, project, type)
 end
 
 def executeApi(obj, port, project, type)
-    cmd = "uwsgi --socket 127.0.0.1:" + port.to_s + " --protocol=http --wsgi-file " + type + "/" + obj + ".py --callable api" 
+    cmd = "uwsgi --enable-threads --socket 127.0.0.1:" + port.to_s + " --protocol=http --wsgi-file " + type + "/" + obj + ".py --callable api" 
     fork{
         track(obj, Process.pid, project, type)
         exec(cmd)
@@ -60,4 +60,6 @@ end
 
 
 closeApi(obj, project, type)
-executeApi(obj, port, project, type)
+if command != "terminate"
+    executeApi(obj, port, project, type)
+end
