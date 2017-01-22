@@ -1,32 +1,54 @@
 {
   "project_name": "myicaroproject",
   "listen_port": 80,
-  "cache_location" : "~/icaro/",
-  "media": "/media/",
   "nginx_path":"/etc/nginx/",
 
   "config_profiles": {
-                      "default": {"proxy_set_header":[
-                                 "Host $http_host",
-                                 "X-Real-IP $remote_addr",
-                                 "X-Forwarded-For $proxy_add_x_forwarded_for",
-                                 "X-Forwarded-Proto $scheme"
+                      "default": {
+                                 "proxy_set_header":[
+                                     "Host $http_host",
+                                     "X-Real-IP $remote_addr",
+                                     "X-Forwarded-For $proxy_add_x_forwarded_for",
+                                     "X-Forwarded-Proto $scheme"
                                  ]
                       } 
   },
 
-  "apis" : [
-              {"name":"myapi1","roles":["all"],"addr":"local","config_profile": "default"},
-              {"name":"auth","roles":["all"],"addr":"local","config_profile": "default"}
-  ],
+  "cache_profile": {
+                    "default_cache": {
+                                      "cache_path": "/etc/icaro_cache",
+                                      "levels": "1:2",
+                                      "max_size": "10g",
+                                      "keys_zone": "mykey",
+                                      "inactive": "60m",
+                                      "use_temp_path": "off"
+                                    }
+  },
+  "containers":[
+    {
+      "name": "mycontainer1",
+      "apis" : [
+          {"name":"api1", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 2, "version": "1.0"},
+          {"name":"api3", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "0.2"}
+    ],
+      "pages" : [
+          {"name":"index", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 2, "version": "1.0"}
+    ],
+      "cpu_limit": "",
+      "memory_limit": "500m"
+    },
 
-  "pages" : [
-              {"name":"index", "addr":"local","config_profile": "default"}
-  ],
+    {
+      "name": "mycontainer2",
+      "apis" : [
+          {"name":"api2", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "1.0"}
+    ],
+      "pages" : [
+          {"name":"report", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "0.9"}
+    ],
+      "cpu_limit": "",
+      "memory_limit": "500m"
+    }
 
-  "db": {
-        "host":"localhost",
-        "user":"root",
-        "psw":""
-  }
+  ]
 }

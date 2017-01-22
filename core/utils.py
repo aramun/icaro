@@ -1,5 +1,6 @@
 import os
 import socket
+import shutil
 
 def checkPort(port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,3 +34,23 @@ def importer(source, destination):
 def mkDir(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
+
+def insertIntoFile(offset1, stringToInsert, file):
+	content = utils.readLines(file)
+	if content.strip().find(stringToInsert.strip()) == -1:
+		n = content.find(offset1)
+		if n != -1:
+			while (content[n] != "{"):
+				n += 1
+			content = content[:n+1] + stringToInsert + content[n+1:]
+			utils.fileWrite(file, content)
+
+def line_prepender(filename, line):
+    with open(filename, 'r+') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(line.rstrip('\r\n') + '\n' + content)
+
+def copytree(source, destination):
+	if not os.path.exists(destination):
+		shutil.copytree(source, destination)
