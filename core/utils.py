@@ -54,3 +54,6 @@ def line_prepender(filename, line):
 def copytree(source, destination):
 	if not os.path.exists(destination):
 		shutil.copytree(source, destination)
+
+def getHome():
+	return os.path.expanduser("~")
