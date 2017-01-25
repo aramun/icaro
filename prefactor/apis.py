@@ -11,7 +11,7 @@ def my_action():
 
 class Root:
 	def on_get(self, req, resp):
-		if security.api(req): 
+		if security.api(req):
 			role = "all"
 			template = render.load_template(role, page, libraries)
 			resp.status = falcon.HTTP_200
@@ -19,9 +19,9 @@ class Root:
 			resp.body = json.dumps(my_action())
 		else:
 			falcon.HTTP_403
-			resp.body = "Access Denied"	
+			resp.body = "Access Denied"
 
 api = falcon.API()
 
-api.add_route('/', Root()) 
+api.add_route('/', Root())
 #you can add subpages
