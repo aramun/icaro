@@ -1,5 +1,5 @@
 import jinja2
-import icaro.security.page as security
+import icaro.utils.security as security
 import os
 
 def build_head(template, libraries, page):
