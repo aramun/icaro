@@ -19,7 +19,7 @@ def createApisLocations(string, apis, settings):
 def createPagesLocations(string, pages, settings):
 	for page in pages:
 		string += "\r\nlocation /"
-		if page["name"] != "index": 
+		if page["name"] != "index":
 			string += page["name"]
 		string += " {\r\n"
 		string += "\tproxy_pass " + page["addr"] + "/;\r\n"
