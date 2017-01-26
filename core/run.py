@@ -13,16 +13,18 @@ def build(settings):
 	nginx.proxyConf(settings)
 	workarea.genFolders()
 	for container in settings["containers"]:
-		workarea.genFiles(container, "apis")
-		workarea.genFiles(container, "pages")
-	containers.genVirtualArea(settings, "apis")
-	containers.genVirtualArea(settings, "pages")
+	    workarea.genFiles(container, "apis")
+	    workarea.genFiles(container, "pages")
+	containers.genVirtualArea(settings)
+	containers.genVirtualArea(settings)
 	built = containers.runContainers(settings)
+        nginx.clusterConf(built, settings)
+        #nginx.mkServer(settings)
 	print "Build Succes! Details: " + json.dumps(built)
 	os.system("chmod -R 777 .")
 
 def shut(settings):
-	containers.shutContainers(settings)
+	containers.shutNodes(settings)
 
 def start(settings, container):
 	nginx.mkServer(settings, apis, pages)

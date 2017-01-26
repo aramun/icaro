@@ -20,6 +20,8 @@ def createProject():
 def buildProject():
 	settings = json.loads(utils.readLines("settings.json"))
 	build(settings)
+        if utils.readLines(selfLocation() + "/monitor/monitor.icaro") == "null":
+            utils.fileWrite(selfLocation() + "/monitor/monitor.icaro","["+settings['project_name']+"]")
 	utils.fileWrite(selfLocation() + "/monitor/monitor.icaro", json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"])))
 
 def shutProject():

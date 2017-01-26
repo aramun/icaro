@@ -1,6 +1,7 @@
 import os
 import socket
 import shutil
+import json
 
 def checkPort(port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,6 +19,18 @@ def readLines(path):
 	content = file.readlines()
 	file.close()
 	return "".join(content)
+
+def jsonUpdate(source, key, val):
+    content = json.loads(readLines(source))
+    content[key] = val
+    fileWrite(source, json.dumps(content))
+
+def jsonArrayUpdate(source, key, val):
+    content = json.loads(readLines(source))
+    for obj in content:
+        obj[key] = val
+    fileWrite(source, json.dumps(content))
+
 
 def createFolder(path):
 	if not os.path.exists(path):

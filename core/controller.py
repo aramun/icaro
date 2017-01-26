@@ -14,12 +14,12 @@ def commandsManager(command):
 	return getattr(sys.modules[__name__], command[0])(",".join(command[1:]))
 
 class Root:
-	def on_post(self, req, resp):
-		global p_key
-		if req.get_header("sec_key") == p_key:
-			resp.status = falcon.HTTP_200
-			resp.content_type = 'application/json'
-			resp.body = commandsManager(req.stream.read())
+    def on_post(self, req, resp):
+        global p_key
+        if req.get_header("sec_key") == p_key:
+	    resp.status = falcon.HTTP_200
+            resp.content_type = 'application/json'
+            resp.body = commandsManager(req.stream.read())
 		else:
 			resp.status = falcon.HTTP_403
 			resp.body = "Permission Denied"

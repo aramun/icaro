@@ -29,12 +29,13 @@
       "icaroConnector":"local",
       "name": "mycontainer1",
       "apis" : [
-          {"name":"api1", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 2, "version": "1.0"},
-          {"name":"api3", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "0.2"}
+          {"name":"api1", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"},
+          {"name":"api3", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "0.2"}
     ],
       "pages" : [
-          {"name":"index", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 2, "version": "1.0"}
+          {"name":"index", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"}
     ],
+      "nodes": 2,
       "cpu_limit": "",
       "memory_limit": "500m"
     },
@@ -43,11 +44,12 @@
       "icaroConnector":"local",
       "name": "mycontainer2",
       "apis" : [
-          {"name":"api2", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "1.0"}
+          {"name":"api2", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"}
     ],
       "pages" : [
-          {"name":"report", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "nodes": 1, "version": "0.9"}
+          {"name":"report", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "0.9"}
     ],
+      "nodes": 1,
       "cpu_limit": "",
       "memory_limit": "500m"
     }
