@@ -4,6 +4,7 @@ import os
 from core.run import build
 from core.run import shut
 import core.utils as utils
+import controller.main as controller
 import monitor.monitor as monitor
 
 def selfLocation():
@@ -22,31 +23,31 @@ def buildProject():
 	build(settings)
         if utils.readLines(selfLocation() + "/monitor/monitor.icaro") == "null":
             utils.fileWrite(selfLocation() + "/monitor/monitor.icaro","["+settings['project_name']+"]")
-	utils.fileWrite(selfLocation() + "/monitor/monitor.icaro", json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"])))
+	#utils.fileWrite(selfLocation() + "/monitor/monitor.icaro", json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"])))
 
 def shutProject():
-	settings = json.loads(utils.readLines("settings.json"))
-	shut(settings)
+    settings = json.loads(utils.readLines("settings.json"))
+    shut(settings)
 
 def rebuildProject():
-	settings = json.loads(utils.readLines("settings.json"))
-	shut(settings)
-	build(settings)
+    settings = json.loads(utils.readLines("settings.json"))
+    shut(settings)
+    build(settings)
 
 def startMonitor():
-	monitor.start()
+    monitor.start()
 
-def deleteProject():
-	ans = raw_input("This action will delete all project are you sure?: (y/n)")
-	if ans == "y" or ans == "yes":
-		settings = json.loads(utils.readLines("settings.json"))
-		deleteProject()
-		return
-	elif ans == "n" or ans == "no":
-		return
-	else:
-		print "Invalid answer!"
-		deleteProject()
+def run(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    settings = json.loads(utils.readLines("settings.json"))
+    controller.run(settings, type, element)
 
-def commandsManager(command):
-	getattr(sys.modules[__name__], command)()
+def commandsManager(command): 
+    command.pop(0)
+    print command
+    if len(command) > 1:
+        return getattr(sys.modules[__name__], command[0])(",".join(command[1:]))
+    else:
+        return getattr(sys.modules[__name__], command[0])()
+

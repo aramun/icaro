@@ -2,7 +2,7 @@
   "project_name": "myicaroproject",
   "listen_port": 80,
   "nginx_path":"/etc/nginx/",
-
+  "virtualarea": "~/icaro/",
   "config_profiles": {
                       "default": {
                                  "proxy_set_header":[

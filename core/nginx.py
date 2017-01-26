@@ -28,9 +28,9 @@ def createElementsStruct(config, settings):
 
 def createApisLocations(string, apis, settings):
 	for api in apis:
-		string += "\r\nlocation /api/" + api["name"] + "/ {\r\n"
-		string += "\tproxy_pass " + api["addr"] + "/;\r\n"
-		string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + api["name"] +";\r\n"
+		string += "\r\nlocation /api/" + api + "/ {\r\n"
+                string += "\tproxy_pass http://" + api + "/;\r\n"
+		string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + api +";\r\n"
 		string += "}"
 	return string
 
@@ -38,39 +38,42 @@ def clusterConf(config, settings):
 	clusters_dir = settings["nginx_path"] + settings["project_name"] + "/clusters/"
 	utils.mkDir(clusters_dir)
         elementsStruct = createElementsStruct(config, settings)
+        clusters = {"apis": [], "pages": []}
         for api in elementsStruct["apis"]:
             upstream = writeUpstream(elementsStruct["apis"][api], api)
+            clusters["apis"].append(api)
 	    utils.fileWrite(clusters_dir + api, upstream)
         for page in elementsStruct["pages"]:
             upstream = writeUpstream(elementsStruct["pages"][page], page)
 	    utils.fileWrite(clusters_dir + page, upstream)
+            clusters["pages"].append(page)
+        return clusters
 
 def createPagesLocations(string, pages, settings):
-	for page in pages:
-		string += "\r\nlocation /"
-		if page["name"] != "index":
-			string += page["name"]
-		string += " {\r\n"
-		string += "\tproxy_pass " + page["addr"] + "/;\r\n"
-		string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + page["name"] +";\r\n"
-		string += "}"
-	return string
+    for page in pages:
+	string += "\r\nlocation /"
+	if page != "index":
+	    string += page
+	string += " {\r\n"
+        string += "\tproxy_pass http://" + page + ";\r\n"
+	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + page+";\r\n"
+	string += "}"
+    return string
 
 def proxyConf(settings):
-	proxy_dir = settings["nginx_path"] + settings["project_name"] + "/proxy/"
-	utils.mkDir(proxy_dir)
-	for container in settings["containers"]:
-		writeProxy(proxy_dir, container["apis"], settings["config_profiles"])
-		writeProxy(proxy_dir, container["pages"], settings["config_profiles"])
+    proxy_dir = settings["nginx_path"] + settings["project_name"] + "/proxy/"
+    utils.mkDir(proxy_dir)
+    for container in settings["containers"]:
+	writeProxy(proxy_dir, container["apis"], settings["config_profiles"])
+	writeProxy(proxy_dir, container["pages"], settings["config_profiles"])
 
-def mkServer(settings):
+def mkServer(settings, clusters):
     server_dir = settings["nginx_path"] + settings["project_name"]
     port = str(settings["listen_port"])
     utils.mkDir(server_dir)
     server = "server{\r\nlisten " + port + " default_server;\r\n listen [::]:" + port + " default_server;\r\n"
-    for container in settings["containers"]:
-        server = createApisLocations(server, container["apis"], settings)
-        server = createPagesLocations(server, container["pages"], settings)
+    server = createApisLocations(server, clusters["apis"], settings)
+    server = createPagesLocations(server, clusters["pages"], settings)
     server += "}"
     utils.fileWrite(server_dir + "/server", server)
     utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/server;", settings["nginx_path"] + "nginx.conf")

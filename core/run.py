@@ -18,8 +18,8 @@ def build(settings):
 	containers.genVirtualArea(settings)
 	containers.genVirtualArea(settings)
 	built = containers.runContainers(settings)
-        nginx.clusterConf(built, settings)
-        #nginx.mkServer(settings)
+        clusters = nginx.clusterConf(built, settings)
+        nginx.mkServer(settings, clusters)
 	print "Build Succes! Details: " + json.dumps(built)
 	os.system("chmod -R 777 .")
 

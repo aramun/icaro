@@ -49,14 +49,14 @@ def mkDir(path):
 		os.makedirs(path)
 
 def insertIntoFile(offset1, stringToInsert, file):
-	content = utils.readLines(file)
+	content = readLines(file)
 	if content.strip().find(stringToInsert.strip()) == -1:
 		n = content.find(offset1)
 		if n != -1:
 			while (content[n] != "{"):
 				n += 1
 			content = content[:n+1] + stringToInsert + content[n+1:]
-			utils.fileWrite(file, content)
+			fileWrite(file, content)
 
 def line_prepender(filename, line):
     with open(filename, 'r+') as f:
