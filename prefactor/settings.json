@@ -1,58 +1,99 @@
 {
-  "project_name": "myicaroproject",
-  "listen_port": 80,
-  "nginx_path":"/etc/nginx/",
-  "virtualarea": "~/icaro/",
-  "config_profiles": {
-                      "default": {
-                                 "proxy_set_header":[
-                                     "Host $http_host",
-                                     "X-Real-IP $remote_addr",
-                                     "X-Forwarded-For $proxy_add_x_forwarded_for",
-                                     "X-Forwarded-Proto $scheme"
-                                 ]
-                      } 
-  },
-
-  "cache_profile": {
-                    "default_cache": {
-                                      "cache_path": "/etc/icaro_cache",
-                                      "levels": "1:2",
-                                      "max_size": "10g",
-                                      "keys_zone": "mykey",
-                                      "inactive": "60m",
-                                      "use_temp_path": "off"
-                                    }
-  },
-  "containers":[
-    {
-      "icaroConnector":"local",
-      "name": "mycontainer1",
-      "apis" : [
-          {"name":"api1", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"},
-          {"name":"api3", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "0.2"}
-    ],
-      "pages" : [
-          {"name":"index", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"}
-    ],
-      "nodes": 2,
-      "cpu_limit": "",
-      "memory_limit": "500m"
-    },
-
-    {
-      "icaroConnector":"local",
-      "name": "mycontainer2",
-      "apis" : [
-          {"name":"api2", "roles":["all"], "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "1.0"}
-    ],
-      "pages" : [
-          {"name":"report", "addr":"local", "config_profile": "default", "cache_profile": "default_cache", "version": "0.9"}
-    ],
-      "nodes": 1,
-      "cpu_limit": "",
-      "memory_limit": "500m"
-    }
-
-  ]
+    "cache_profile": {
+        "default_cache": {
+            "cache_path": "/etc/icaro_cache", 
+            "inactive": "60m", 
+            "keys_zone": "mykey", 
+            "levels": "1:2", 
+            "max_size": "10g", 
+            "use_temp_path": "off"
+        }
+    }, 
+    "config_profiles": {
+        "default": {
+            "proxy_set_header": [
+                "Host $http_host", 
+                "X-Real-IP $remote_addr", 
+                "X-Forwarded-For $proxy_add_x_forwarded_for", 
+                "X-Forwarded-Proto $scheme"
+            ]
+        }
+    }, 
+    "containers": [
+        {
+            "apis": [
+                {
+                    "addr": "local", 
+                    "cache_profile": "default_cache", 
+                    "config_profile": "default", 
+                    "name": "api1", 
+                    "roles": [
+                        "all"
+                    ], 
+                    "versions":["1.2"],
+                    "current_version": "1.2"
+                }, 
+                {
+                    "addr": "local", 
+                    "cache_profile": "default_cache", 
+                    "config_profile": "default", 
+                    "name": "api3", 
+                    "roles": [
+                        "all"
+                    ], 
+                    "versions":["1.3", "1.5"],
+                    "current_version": "1.5"
+                }
+            ], 
+            "cpu_limit": "",
+            "icaroConnector": "local", 
+            "memory_limit": "500m", 
+            "name": "mycontainer1", 
+            "nodes": 2, 
+            "pages": [
+                {
+                    "addr": "local", 
+                    "cache_profile": "default_cache", 
+                    "config_profile": "default", 
+                    "name": "index", 
+                    "versions":["1.0", "1.5"],
+                    "current_version": "1.5"
+                }
+            ]
+        }, 
+        {
+            "apis": [
+                {
+                    "addr": "local", 
+                    "cache_profile": "default_cache", 
+                    "config_profile": "default", 
+                    "name": "api2", 
+                    "roles": [
+                        "all"
+                    ],
+		    "versions":["1.0", "1.5"],
+                    "current_version": "1.5"
+                }
+            ], 
+            "cpu_limit": "", 
+            "icaroConnector": "local", 
+            "memory_limit": "500m", 
+            "name": "mycontainer2", 
+            "nodes": 1, 
+            "pages": [
+                {
+                    "addr": "local", 
+                    "cache_profile": "default_cache", 
+                    "config_profile": "default", 
+                    "name": "report", 
+                    "versions":["1.0", "1.5"],
+                    "current_version": "1.5"
+                }
+            ]
+        }
+    ], 
+    "listen_port": 8090, 
+    "nginx_path": "/etc/nginx/", 
+    "project_name": "sesto",
+    "virtualarea": "~/icaro/"
 }

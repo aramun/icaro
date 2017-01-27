@@ -17,6 +17,6 @@ def getElement(settings, type, element):
 def run(settings, type, element):
     element = getElement(settings, type, element)
     for node in element:
-        r = requests.post("http://" + node["addr"] + ":10036", data=json.dumps(node))
+        r = requests.post("http://" + node["addr"] + ":10036", data="run " + json.dumps(node).replace(" ", ""))
         print(r.text)
 

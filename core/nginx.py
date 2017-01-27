@@ -20,19 +20,21 @@ def createElementsStruct(config, settings):
     for container in config:
         for node in config[container]:
             for element in node["elements"]:
-                if not element["name"] in struct[element["type"]]:
-                    struct[element["type"]][element["name"]] = [element["addr"] + ":" + str(element["port"])]
+                if not element["name"] + "v" + element["version"] in struct[element["type"]]:
+                    struct[element["type"]][element["name"] + "v" + element["version"]] = [element["addr"] + ":" + str(element["port"])]
                 else:
-                    struct[element["type"]][element["name"]].append(element["addr"] + ":" + str(element["port"]))
+                    struct[element["type"]][element["name"] + "v" + element["version"]].append(element["addr"] + ":" + str(element["port"]))
     return struct
 
 def createApisLocations(string, apis, settings):
-	for api in apis:
-		string += "\r\nlocation /api/" + api + "/ {\r\n"
-                string += "\tproxy_pass http://" + api + "/;\r\n"
-		string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + api +";\r\n"
-		string += "}"
-	return string
+    for api in apis:
+        apiName = api.split("v")[0]
+        version = api.split("v")[1]
+	string += "\r\nlocation /api/" + apiName + "/" + version + " {\r\n"
+        string += "\tproxy_pass http://" + api+ "/;\r\n"
+	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + apiName +";\r\n"
+	string += "}"
+    return string
 
 def clusterConf(config, settings):
 	clusters_dir = settings["nginx_path"] + settings["project_name"] + "/clusters/"
@@ -51,12 +53,14 @@ def clusterConf(config, settings):
 
 def createPagesLocations(string, pages, settings):
     for page in pages:
+        pageName = page.split("v")[0]
+        version = page.split("v")[1]
 	string += "\r\nlocation /"
 	if page != "index":
-	    string += page
+	    string += page + "/" + version
 	string += " {\r\n"
-        string += "\tproxy_pass http://" + page + ";\r\n"
-	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + page+";\r\n"
+        string += "\tproxy_pass http://" + page + "/;\r\n"
+	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + pageName+";\r\n"
 	string += "}"
     return string
 
@@ -76,4 +80,9 @@ def mkServer(settings, clusters):
     server = createPagesLocations(server, clusters["pages"], settings)
     server += "}"
     utils.fileWrite(server_dir + "/server", server)
+    for api in clusters["apis"]:
+        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/clusters/" + api  + ";", settings["nginx_path"] + "nginx.conf")
+    for page in clusters["pages"]:
+        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/clusters/" + page + ";", settings["nginx_path"] + "nginx.conf")
     utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/server;", settings["nginx_path"] + "nginx.conf")
+    

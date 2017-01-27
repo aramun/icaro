@@ -2,9 +2,17 @@ import falcon
 import json
 import os
 import sys
+import subprocess
 
+def check_output(command):
+    p = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    return {"out": out, "err": err}
+    
 def run(element):
-    os.system("ruby core.rb run " + element)
+    command = 'python core.py run ' + element
+    out = check_output(command)["out"]
+    return out
 
 def prova(string):
     return string
@@ -12,6 +20,7 @@ def prova(string):
 def commandsManager(command):
     command = command.split(" ")
     return getattr(sys.modules[__name__], command[0])(",".join(command[1:]))
+
 
 class Root:
     def on_post(self, req, resp):

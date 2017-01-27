@@ -10,9 +10,10 @@ virtualarea = utils.getHome() + "/icaro/"
 
 def tracker(container, type, port, config):
     for element in container[type]:
-        obj = {'type': type, 'port': port, 'name': element["name"]}
-        config.append(obj)
-        port += 1
+        for version in element["versions"]:
+            obj = {'type': type, 'port': port, 'name': element["name"], 'version': version}
+            config.append(obj)
+            port += 1
     return config
 
 def createContainer(container, path, port):
@@ -26,16 +27,18 @@ def createContainer(container, path, port):
     dockerfile += "EXPOSE 10036\n"
     dockerfile += 'CMD ["apt-get", "install", "update"]\n'
     dockerfile += 'CMD ["apt-get", "install", "upgrade"]\n'
+    dockerfile += 'CMD ["apt-get", "install", "ruby"]\n'
     dockerfile += 'CMD ["uwsgi", "--enable-threads", "--http-socket", "0.0.0.0:10036", "--wsgi-file", "controller.py", "--callable", "api"]'
     return dockerfile
 
-def clearVersion(folder, versions):
-    #versions is number of version from last to preserve
-    if len(list(os.walk(folder))) > versions:
-        shutil.rmtree(list(os.walk(folder))[0])
+def cleanVersions(element, type, destination):
+    destination = destination + "/" + type + '/' + element['name'] + '/'
+    for folder in os.listdir(destination):
+        if not folder in element["versions"]:
+            shutil.rmtree(destination)
 
 def createRequirements():
-    return "falcon==1.1.0\r\nuwsgi==2.0.14"
+    return "falcon==1.1.0\r\nuwsgi==2.0.14\r\nrequests==2.12.4"
 
 def controller(destination):
     key = str(uuid.uuid4())
@@ -45,9 +48,10 @@ def controller(destination):
 
 def genFolders(container, type, destination):
     print "Generating VirtualArea - " + container["name"] + "'s " + type
-    for element in container[type]:
-        utils.mkDir(destination + "/" + type + '/' + element['name'] + '/' + element['version'])
-        utils.importer(type + "/" + element["name"] + ".py", destination + "/" + type + '/' + element['name'] + '/' + element['version'] + "/" + element["name"] + ".py")
+    for element in container[type]: 
+        utils.mkDir(destination + "/" + type + '/' + element['name'] + '/' + element["current_version"])
+        utils.importer(type + "/" + element["name"] + ".py", destination + "/" + type + '/' + element['name'] + '/' + element["current_version"] + "/" + element["name"] + ".py")
+        cleanVersions(element, type, destination)
     if type == "pages":
         utils.copytree("widgets", destination + "/widgets")
         utils.copytree("pages/libraries", destination + "/pages/libraries")
@@ -68,11 +72,11 @@ def genVirtualArea(settings):
             destination = virtualarea + settings['project_name'] + '/' + container["name"] + "-" + str(node)
             genFolders(container, "apis", destination)
             genFolders(container, "pages", destination)
-            #clearVersion(destination, 10)
             utils.fileWrite(destination + "/requirements.txt", createRequirements())
             utils.fileWrite(destination + "/Dockerfile", createContainer(container, destination, 8000))
             controller(destination)
             utils.importer(utils.selfLocation() + "/core.rb", destination + "/" + "core.rb")
+            utils.importer(utils.selfLocation() + "/core.py", destination + "/" + "core.py")
 
 def buildContainer(client, node, containerName, project_name):
     print "Building " + containerName + "..."
