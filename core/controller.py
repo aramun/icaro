@@ -14,9 +14,6 @@ def run(element):
     out = check_output(command)["out"]
     return out
 
-def prova(string):
-    return string
-
 def commandsManager(command):
     command = command.split(" ")
     return getattr(sys.modules[__name__], command[0])(",".join(command[1:]))

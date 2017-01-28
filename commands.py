@@ -45,7 +45,6 @@ def run(args):
 
 def commandsManager(command): 
     command.pop(0)
-    print command
     if len(command) > 1:
         return getattr(sys.modules[__name__], command[0])(",".join(command[1:]))
     else:

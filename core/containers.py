@@ -27,7 +27,6 @@ def createContainer(container, path, port):
     dockerfile += "EXPOSE 10036\n"
     dockerfile += 'CMD ["apt-get", "install", "update"]\n'
     dockerfile += 'CMD ["apt-get", "install", "upgrade"]\n'
-    dockerfile += 'CMD ["apt-get", "install", "ruby"]\n'
     dockerfile += 'CMD ["uwsgi", "--enable-threads", "--http-socket", "0.0.0.0:10036", "--wsgi-file", "controller.py", "--callable", "api"]'
     return dockerfile
 
@@ -75,9 +74,6 @@ def genVirtualArea(settings):
             utils.fileWrite(destination + "/requirements.txt", createRequirements())
             utils.fileWrite(destination + "/Dockerfile", createContainer(container, destination, 8000))
             controller(destination)
-            utils.importer(utils.selfLocation() + "/core.rb", destination + "/" + "core.rb")
-            utils.importer(utils.selfLocation() + "/core.py", destination + "/" + "core.py")
-
 def buildContainer(client, node, containerName, project_name):
     print "Building " + containerName + "..."
     return client.images.build(path = virtualarea + project_name + "/" + containerName + "-" + str(node))
