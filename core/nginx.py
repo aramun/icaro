@@ -56,8 +56,10 @@ def createPagesLocations(string, pages, settings):
         pageName = page.split("v")[0]
         version = page.split("v")[1]
 	string += "\r\nlocation /"
-	if page != "index":
-	    string += page + "/" + version
+	if pageName != "index" and version != "current":
+	    string += pageName
+        else:
+            string += version
 	string += " {\r\n"
         string += "\tproxy_pass http://" + page + "/;\r\n"
 	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + pageName+";\r\n"

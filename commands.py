@@ -37,11 +37,26 @@ def rebuildProject():
 def startMonitor():
     monitor.start()
 
+def runAll(args):
+    type = args.split(",")[0]
+    settings = json.loads(utils.readLines("settings.json"))
+    controller.runAll(settings, type)
+
 def run(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
     settings = json.loads(utils.readLines("settings.json"))
     controller.run(settings, type, element)
+
+def whereismyelement(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    settings = json.loads(utils.readLines("settings.json"))
+    print controller.whereismyelement(settings, type, element)
+
+def htop(args):
+    containerName = args.split(",")[0]
+    print controller.htop(containerName)
 
 def commandsManager(command): 
     command.pop(0)
