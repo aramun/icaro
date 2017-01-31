@@ -15,6 +15,7 @@ def writeUpstream(addrs, elementName):
     upstream += "}"
     return upstream
 
+
 def createElementsStruct(config, settings):
     struct = {"apis": {}, "pages":{}}
     for container in config:
@@ -31,7 +32,7 @@ def createApisLocations(string, apis, settings):
         apiName = api.split("v")[0]
         version = api.split("v")[1]
 	string += "\r\nlocation /api/" + apiName + "/" + version + " {\r\n"
-        string += "\tproxy_pass http://" + api+ "/;\r\n"
+        string += "\tproxy_pass http://" + settings["project_name"] + "-" + api+ "/;\r\n"
 	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + apiName +";\r\n"
 	string += "}"
     return string
@@ -42,12 +43,12 @@ def clusterConf(config, settings):
         elementsStruct = createElementsStruct(config, settings)
         clusters = {"apis": [], "pages": []}
         for api in elementsStruct["apis"]:
-            upstream = writeUpstream(elementsStruct["apis"][api], api)
+            upstream = writeUpstream(elementsStruct["apis"][api], settings["project_name"] + "-" + api)
             clusters["apis"].append(api)
-	    utils.fileWrite(clusters_dir + api, upstream)
+	    utils.fileWrite(clusters_dir + settings["project_name"] + "-" + api, upstream)
         for page in elementsStruct["pages"]:
-            upstream = writeUpstream(elementsStruct["pages"][page], page)
-	    utils.fileWrite(clusters_dir + page, upstream)
+            upstream = writeUpstream(elementsStruct["pages"][page], settings["project_name"] + "-" + page)
+	    utils.fileWrite(clusters_dir + settings["project_name"] + "-" + page, upstream)
             clusters["pages"].append(page)
         return clusters
 
@@ -57,11 +58,11 @@ def createPagesLocations(string, pages, settings):
         version = page.split("v")[1]
 	string += "\r\nlocation /"
 	if pageName != "index" and version != "current":
-	    string += pageName
+	    string += pageName + "/" + version
         else:
             string += version
 	string += " {\r\n"
-        string += "\tproxy_pass http://" + page + "/;\r\n"
+        string += "\tproxy_pass http://" + settings["project_name"] + "-" + page + "/;\r\n"
 	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + pageName+";\r\n"
 	string += "}"
     return string
@@ -81,10 +82,11 @@ def mkServer(settings, clusters):
     server = createApisLocations(server, clusters["apis"], settings)
     server = createPagesLocations(server, clusters["pages"], settings)
     server += "}"
+    project_name = settings["project_name"]
     utils.fileWrite(server_dir + "/server", server)
     for api in clusters["apis"]:
-        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/clusters/" + api  + ";", settings["nginx_path"] + "nginx.conf")
+        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + project_name + "/clusters/" + project_name + "-" + api  + ";", settings["nginx_path"] + "nginx.conf")
     for page in clusters["pages"]:
-        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/clusters/" + page + ";", settings["nginx_path"] + "nginx.conf")
-    utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + settings["project_name"] + "/server;", settings["nginx_path"] + "nginx.conf")
+        utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + project_name + "/clusters/" + project_name + "-" + page + ";", settings["nginx_path"] + "nginx.conf")
+    utils.insertIntoFile("http", "\r\ninclude " + settings["nginx_path"] + project_name + "/server;", settings["nginx_path"] + "nginx.conf")
     

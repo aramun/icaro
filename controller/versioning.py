@@ -1,0 +1,57 @@
+import json
+import icaro.core.utils as utils
+import main as controller
+import os
+
+def confirmation(message):
+    ans = raw_input(message + " (Y/N)")
+    if ans == "y" or ans == "yes":
+        return True
+    elif ans == "n" or ans == "no":
+        return False
+    else:
+        print "You have to say yes or no"
+        confirmation(message)
+
+def getElement(settings, type, elementName):
+    for container in settings["containers"]:
+        for element in container[type]:
+            if element["name"] == elementName:
+                return element
+
+def versions(settings, type, element):
+    element = getElement(settings, type, element)
+    return element["versions"]
+
+def checkout(settings, type, element, version):
+    versions_arr = versions(settings, type, element)
+    if version in versions_arr:
+        virtualarea = settings["virtualarea"].replace("~", utils.getHome()) + settings["project_name"]
+        for container in settings["containers"]:
+            for elem in container[type]:
+                if elem["name"] == element:
+                    elem["current_version"] = version
+                    virtual_path = virtualarea + "/" + container["name"] + "-0/" + type + "/" + element + "/" + version + "/" + element + ".py"
+                    if os.path.isfile(virtual_path):
+                        utils.importer(virtual_path, type + "/" + element + ".py")
+        utils.fileWrite("settings.json", json.dumps(settings, indent = 4))
+        return "Checkout to version " + version
+    else:
+        if confirmation("Version doesn't exists do you want add it?"):
+            addversion(settings, type, element, version)
+
+def addversion(settings, type, element, version):
+    versions_arr = versions(settings, type, element)
+    if not version in versions_arr:
+        virtualarea = settings["virtualarea"].replace("~", utils.getHome()) + settings["project_name"]
+        elem = getElement(settings, type, element)
+        elem["versions"].append(version)
+        utils.fileWrite("settings.json", json.dumps(settings, indent = 4))
+        if confirmation("Do you want checkout in the new version?"):
+            checkout(settings, type, element, version)
+    else:
+        if confirmation("Version already exists, do you wanna checkout?"):
+            checkout(settings, type, element, version)
+
+
+

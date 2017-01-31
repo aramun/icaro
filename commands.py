@@ -1,44 +1,48 @@
-import sys
-import json
-import os
-from core.run import build
-from core.run import shut
-import core.utils as utils
+import sys 
+import json 
+import os 
+from core.run import build 
+from core.run import shut 
+import core.utils as utils 
 import controller.main as controller
+import controller.versioning as versioning
 import monitor.monitor as monitor
 
-def selfLocation():
-	return os.path.dirname(os.path.realpath(__file__))
+def selfLocation(): 
+    return os.path.dirname(os.path.realpath(__file__))
 
-def createProject():
-	project_name = raw_input("Please insert project name: ")
-	file = selfLocation() + "/prefactor/settings.json"
-	content = json.loads(utils.readLines(file))
-	content["project_name"] = project_name
-	utils.createFolder(project_name)
-	utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4, sort_keys=True))
+def createProject(): 
+    project_name = raw_input("Please insert project name: ")
+    file = selfLocation() + "/prefactor/settings.json" 
+    content = json.loads(utils.readLines(file))
+    utils.importer(selfLocation() + "/manager.py", "manager.py")#--> da implementare
+    content["project_name"] = project_name
+    utils.createFolder(project_name)
+    utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4, sort_keys=True))
 
-def buildProject():
-	settings = json.loads(utils.readLines("settings.json"))
-	build(settings)
-        if utils.readLines(selfLocation() + "/monitor/monitor.icaro") == "null":
-            utils.fileWrite(selfLocation() + "/monitor/monitor.icaro","["+settings['project_name']+"]")
-	#utils.fileWrite(selfLocation() + "/monitor/monitor.icaro", json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"])))
+def buildProject(): 
+    settings = json.loads(utils.readLines("settings.json"))
+    build(settings) 
+    os.system("sudo service nginx restart")
+    #if #utils.readLines(selfLocation() + "/monitor/monitor.icaro") == "null":
+        #utils.fileWrite(selfLocation() + "/monitor/monitor.icaro","["+settings['project_name']+"]")
+    #utils.fileWrite(selfLocation() + "/monitor/monitor.icaro",
+    #json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"]))
 
-def shutProject():
+def shutProject(): 
     settings = json.loads(utils.readLines("settings.json"))
     shut(settings)
 
-def rebuildProject():
+def rebuildProject(): 
     settings = json.loads(utils.readLines("settings.json"))
     shut(settings)
     build(settings)
 
-def startMonitor():
+def startMonitor(): 
     monitor.start()
 
 def runAll(args):
-    type = args.split(",")[0]
+    type = args.split(",")[0] 
     settings = json.loads(utils.readLines("settings.json"))
     controller.runAll(settings, type)
 
@@ -54,10 +58,31 @@ def whereismyelement(args):
     settings = json.loads(utils.readLines("settings.json"))
     print controller.whereismyelement(settings, type, element)
 
+def versions(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    settings = json.loads(utils.readLines("settings.json"))
+    for version in versioning.versions(settings, type, element):
+        print version + "\n\t"
+
+def checkout(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    version = args.split(",")[2]
+    settings = json.loads(utils.readLines("settings.json"))
+    print versioning.checkout(settings, type, element, version)
+
+def addversion(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    version = args.split(",")[2]
+    settings = json.loads(utils.readLines("settings.json"))
+    print versioning.addversion(settings, type, element, version)
+
 def htop(args):
     containerName = args.split(",")[0]
     print controller.htop(containerName)
-
+    
 def commandsManager(command): 
     command.pop(0)
     if len(command) > 1:
