@@ -1,4 +1,3 @@
-import commands
-import sys
+import shell
 
-commands.commandsManager(sys.argv)
+shell.IcaroShell().cmdloop()
