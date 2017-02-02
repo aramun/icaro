@@ -36,7 +36,7 @@ def getData():
 class Static:
 	def on_get(self, req, resp, widget, type, file):
 		role = "principal"
-		if security.static(req, page, role, widget, "127.0.0.1):
+		if security.static(req, page, role, widget, "127.0.0.1"):
 			file = "widgets/" + widget + "/" + type + "/" +file
 			resp.status = falcon.HTTP_200
 			mime = magic.Magic(mime=True)

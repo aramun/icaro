@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import icaro.core.utils as utils
+import tarfile
 import docker
 
 def getElement(settings, type, element):
@@ -21,11 +22,13 @@ def getElement(settings, type, element):
 
 def run(settings, type, element):
     element = getElement(settings, type, element)
-    client = docker.from_env()
+    client = docker.from_env()  
     for node in element:
+        print "Runnning "+ type +": "+ node["name"] + " version " + node["version"] + "..."
         cmd = "uwsgi --enable-threads --http-socket 0.0.0.0:" + str(node["port"]) + " --wsgi-file " + node["type"] + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py --callable api"
         container = client.containers.get(node["container"])
-        print container.exec_run(cmd, stream = True, detach=True)
+        container.exec_run('pkill -9 -f "' + cmd + '"', stream = True, detach=True)
+        container.exec_run(cmd, stream = True, detach=True)
 
 def runAll(settings, type):
     virtualarea = settings["virtualarea"].replace("~", utils.getHome())
@@ -44,12 +47,11 @@ def whereismyelement(settings, type, element):
         if not container.name in containers:
             containers.append(container.name)
     return json.dumps(containers)
-    
 
 def htop(containerName):
     client = docker.from_env()
     container = client.containers.get(containerName)
-    top = container.top()
+    top = container.top(ps_args="aux")
     processes = []
     for process in top["Processes"]:
         obj = {}
@@ -61,9 +63,12 @@ def htop(containerName):
     return json.dumps(processes, indent=2)
 
 def update(settings, type, element):
-    element = getElement(settings, type, element)
+    node_list = getElement(settings, type, element)
+    print node_list
     client = docker.from_env()
-    for node in element:
-        cmd = "uwsgi --enable-threads --http-socket 0.0.0.0:" + str(node["port"]) + " --wsgi-file " + node["type"] + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py --callable api"
-        container = client.containers.get(node["container"])
-        print container.exec_run(cmd, stream = True)
+    for node in node_list:
+        if node["version"] == node["current_version"]:
+            container_endpoint = node["container"] + ":/usr/src/app/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py"
+            os.system("sudo docker cp " + type + "/" + node["name"] + ".py" + " " + container_endpoint)
+        print run(settings, type, element)
+

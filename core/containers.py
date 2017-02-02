@@ -11,7 +11,11 @@ virtualarea = utils.getHome() + "/icaro/"
 def tracker(container, type, port, config):
     for element in container[type]:
         for version in element["versions"]:
-            obj = {'type': type, 'port': port, 'name': element["name"], 'version': version}
+            obj = {'type': type,
+                   'port': port,
+                   'name': element["name"],
+                   'version': version,
+                   'current_version': element["current_version"]}
             config.append(obj)
             port += 1
     return config
@@ -74,6 +78,7 @@ def genVirtualArea(settings):
             utils.fileWrite(destination + "/requirements.txt", createRequirements())
             utils.fileWrite(destination + "/Dockerfile", createContainer(container, destination, 8000))
             controller(destination)
+
 def buildContainer(client, node, containerName, project_name):
     print "Building " + containerName + "..."
     return client.images.build(path = virtualarea + project_name + "/" + containerName + "-" + str(node))
@@ -82,11 +87,8 @@ def runContainer(container, project_name, node):
     client = docker.from_env()
     hostname = str(uuid.uuid4()) + "-host"
     containerDocker = client.containers.run(buildContainer(client, node, container["name"], project_name).id,
-                                                     detach = True,
-                                                     name = project_name + "-" + container["name"] + "-" + str(node),
-                                                     hostname = hostname,
-                                                     network_mode="bridge",
-                                                     mem_limit = container["memory_limit"])
+                                                           detach = True,
+                                                           name = project_name + "-" + container["name"] + "-" + str(node), hostname = hostname, network_mode="bridge", mem_limit = container["memory_limit"])
     print "Running " + container["name"] + " - node" + str(node)  + "..."
     name = containerDocker.name
     addr = client.containers.get(containerDocker.id).attrs["NetworkSettings"]["IPAddress"]
@@ -96,8 +98,13 @@ def runContainer(container, project_name, node):
 
 def shutNode(container, node, project_name):
     client = docker.from_env()
-    client.containers.get(project_name + "-" + container + "-" + str(node)).stop(timeout=1)
-    client.containers.get(project_name + "-" + container + "-" + str(node)).remove(v=True)
+    try:
+        print "Stopping " + container + " node " + str(node) + "..."
+        client.containers.get(project_name + "-" + container + "-" + str(node)).stop(timeout=1)
+        print "Turning off " + container + " node " + str(node) + "..."
+        client.containers.get(project_name + "-" + container + "-" + str(node)).remove(v=True)
+    except(docker.errors.NotFound):
+        print "Node not found"
     return project_name + "-" + container + "-" + str(node)
 
 def runContainers(settings):
@@ -105,6 +112,7 @@ def runContainers(settings):
     for container in settings["containers"]:
         containers[container["name"]] = []
         for node in range(0, container["nodes"]):
+            shutNode(container["name"], node, settings["project_name"])
             containers[container["name"]].append(runContainer(container, settings["project_name"], node))
     createMonitor(virtualarea + settings["project_name"], containers)
     return containers

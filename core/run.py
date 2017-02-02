@@ -20,8 +20,8 @@ def build(settings):
 	built = containers.runContainers(settings)
         clusters = nginx.clusterConf(built, settings)
         nginx.mkServer(settings, clusters)
-	print "Build Succes! Details: " + json.dumps(built)
-	os.system("chmod -R 777 .")
+        return built
+
 
 def shut(settings):
 	containers.shutNodes(settings)

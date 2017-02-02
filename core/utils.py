@@ -2,6 +2,7 @@ import os
 import socket
 import shutil
 import json
+import tarfile
 
 def checkPort(port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,6 +32,12 @@ def jsonArrayUpdate(source, key, val):
         obj[key] = val
     fileWrite(source, json.dumps(content))
 
+def get_tar_byte(source):
+    with tarfile.open("api.tar.gz", "w:gz") as tar:
+        tar.add(source, arcname=os.path.basename(source))
+    with open("api.tar", "rb") as binary_file:
+        return binary_file.read()
+    
 
 def createFolder(path):
 	if not os.path.exists(path):

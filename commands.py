@@ -2,11 +2,13 @@ import sys
 import json 
 import os 
 from core.run import build 
-from core.run import shut 
+from core.run import shut
+import monitor.monitor as monitor
 import core.utils as utils 
 import controller.main as controller
 import controller.versioning as versioning
 import monitor.monitor as monitor
+
 
 def selfLocation(): 
     return os.path.dirname(os.path.realpath(__file__))
@@ -22,21 +24,22 @@ def createProject():
 
 def buildProject(): 
     settings = json.loads(utils.readLines("settings.json"))
-    build(settings) 
-    os.system("sudo service nginx restart")
-    #if #utils.readLines(selfLocation() + "/monitor/monitor.icaro") == "null":
-        #utils.fileWrite(selfLocation() + "/monitor/monitor.icaro","["+settings['project_name']+"]")
-    #utils.fileWrite(selfLocation() + "/monitor/monitor.icaro",
-    #json.dumps(json.loads(utils.readLines(selfLocation() + "/monitor/monitor.icaro")).append("~/icaro/" + settings["project_name"]))
+    build(settings)# --> quando abbiamo le opzioni di logging logghiamo qua
+    print "Build Success!"
+    os.system("chmod -R 777 .")
+    os.system("service nginx restart")
+    runAll("apis")
+    runAll("pages")
+
+def update(args): 
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    settings = json.loads(utils.readLines("settings.json"))
+    controller.update(settings, type, element)
 
 def shutProject(): 
     settings = json.loads(utils.readLines("settings.json"))
     shut(settings)
-
-def rebuildProject(): 
-    settings = json.loads(utils.readLines("settings.json"))
-    shut(settings)
-    build(settings)
 
 def startMonitor(): 
     monitor.start()
