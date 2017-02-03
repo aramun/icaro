@@ -17,7 +17,6 @@ def createProject():
     project_name = raw_input("Please insert project name: ")
     file = selfLocation() + "/prefactor/settings.json" 
     content = json.loads(utils.readLines(file))
-    utils.importer(selfLocation() + "/manager.py", "manager.py")#--> da implementare
     content["project_name"] = project_name
     utils.createFolder(project_name)
     utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4, sort_keys=True))
@@ -67,6 +66,12 @@ def versions(args):
     settings = json.loads(utils.readLines("settings.json"))
     for version in versioning.versions(settings, type, element):
         print version + "\n\t"
+
+def current(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    settings = json.loads(utils.readLines("settings.json"))
+    print versioning.current_version(settings, type, element)
 
 def checkout(args):
     type = args.split(",")[0]

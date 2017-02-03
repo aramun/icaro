@@ -19,6 +19,10 @@ def getElement(settings, type, elementName):
             if element["name"] == elementName:
                 return element
 
+def current_version(settings, type, element):
+    node = getElement(settings, type, element)
+    return node["current_version"]
+
 def versions(settings, type, element):
     element = getElement(settings, type, element)
     return element["versions"]
@@ -52,6 +56,4 @@ def addversion(settings, type, element, version):
     else:
         if confirmation("Version already exists, do you wanna checkout?"):
             checkout(settings, type, element, version)
-
-
 

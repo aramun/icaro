@@ -16,7 +16,6 @@ def build(settings):
 	    workarea.genFiles(container, "apis")
 	    workarea.genFiles(container, "pages")
 	containers.genVirtualArea(settings)
-	containers.genVirtualArea(settings)
 	built = containers.runContainers(settings)
         clusters = nginx.clusterConf(built, settings)
         nginx.mkServer(settings, clusters)

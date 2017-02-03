@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import icaro.core.utils as utils
+import versioning
 import tarfile
 import docker
 
@@ -64,11 +65,12 @@ def htop(containerName):
 
 def update(settings, type, element):
     node_list = getElement(settings, type, element)
-    print node_list
+    virtualarea = settings["virtualarea"].replace("~", utils.getHome()) + settings["project_name"]
     client = docker.from_env()
     for node in node_list:
-        if node["version"] == node["current_version"]:
+        if node["version"] == versioning.current_version(settings, type, element):
             container_endpoint = node["container"] + ":/usr/src/app/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py"
+            utils.importer(type + "/" + node["name"] + ".py", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py" )
             os.system("sudo docker cp " + type + "/" + node["name"] + ".py" + " " + container_endpoint)
         print run(settings, type, element)
 
