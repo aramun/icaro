@@ -1,9 +1,11 @@
 import json
 import requests
 import os
+import shutil
 import icaro.core.utils as utils
 import versioning
 import tarfile
+import distutils.dir_util as dir_util
 import docker
 
 def getElement(settings, type, element):
@@ -71,6 +73,11 @@ def update(settings, type, element):
         if node["version"] == versioning.current_version(settings, type, element):
             container_endpoint = node["container"] + ":/usr/src/app/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py"
             utils.importer(type + "/" + node["name"] + ".py", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py" )
+            if type == "pages":
+                dir_util.copy_tree("widgets", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/widgets")
+                dir_util.copy_tree("pages/libraries", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/pages/libraries")
+                os.system("sudo docker cp widgets " + node["container"] + ":/usr/src/app")
+                os.system("sudo docker cp pages/libraries " + node["container"] + ":/usr/src/app/pages")
             os.system("sudo docker cp " + type + "/" + node["name"] + ".py" + " " + container_endpoint)
         print run(settings, type, element)
 

@@ -5,6 +5,7 @@ import subprocess
 import docker
 import uuid
 import utils
+import icaro.controller.packages as packages
 
 virtualarea = utils.getHome() + "/icaro/"
 
@@ -26,16 +27,7 @@ def createContainer(container, path, port):
     config = tracker(container, "apis", port, config)
     config = tracker(container, "pages", port+len(config), config)
     utils.fileWrite(path + "/config.icaro", json.dumps(config))
-    dockerfile += """
-        COPY oracle /usr/\n
-        RUN echo "/usr/lib/oracle/12.1/client64/lib" > /etc/ld.so.conf.d/oracle.conf\n
-        ENV ORACLE_HOME /usr/lib/oracle/12.1/client64\n
-        ENV LD_LIBRARY_PATH /usr/lib/oracle/12.1/client64/lib\n
-        RUN ldconfig\n
-        RUN apt-get -y update\n
-        RUN apt-get -y install libaio-dev\n
-        RUN pip install cx_Oracle\n
-    """
+    dockerfile += packages.dockerfile(container["packages"])
     for element in config:
         dockerfile += "EXPOSE " + str(element["port"]) + "\n"
     dockerfile += "EXPOSE 10036\n"
@@ -49,7 +41,11 @@ def cleanVersions(element, type, destination):
             shutil.rmtree(destination)
 
 def createRequirements():
-    return "falcon==1.1.0\r\nuwsgi==2.0.14\r\nrequests==2.12.4\r\n"
+    return """falcon==1.1.0\r\n
+            uwsgi==2.0.14\r\n
+            requests==2.12.4\r\n
+            python-magic==0.4.12\r\n
+            jinja2==2.8.1\r\n"""
 
 def controller(destination):
     key = str(uuid.uuid4())
@@ -62,10 +58,7 @@ def genFolders(container, type, destination):
     for element in container[type]: 
         utils.mkDir(destination + "/" + type + '/' + element['name'] + '/' + element["current_version"])
         utils.importer(type + "/" + element["name"] + ".py", destination + "/" + type + '/' + element['name'] + '/' + element["current_version"] + "/" + element["name"] + ".py")
-        if not os.path.exists(destination + "/oracle"):
-            shutil.copytree("/usr/lib/oracle", destination + "/oracle/lib/oracle")#--> da rendere dinamica a livello settings
-            shutil.copytree("/usr/share/oracle", destination + "/oracle/share/oracle")#--> da rendere dinamica a livello settings
-            shutil.copytree("/usr/include/oracle", destination + "/oracle/include/oracle")#--> da rendere dinamica a livello settings
+        packages.include(container["packages"], destination)
         cleanVersions(element, type, destination)
     if type == "pages":
         utils.copytree("widgets", destination + "/widgets")

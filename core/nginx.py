@@ -21,16 +21,16 @@ def createElementsStruct(config, settings):
     for container in config:
         for node in config[container]:
             for element in node["elements"]:
-                if not element["name"] + "v" + element["version"] in struct[element["type"]]:
-                    struct[element["type"]][element["name"] + "v" + element["version"]] = [element["addr"] + ":" + str(element["port"])]
+                if not element["name"] + "~~" + element["version"] in struct[element["type"]]:
+                    struct[element["type"]][element["name"] + "~~" + element["version"]] = [element["addr"] + ":" + str(element["port"])]
                 else:
-                    struct[element["type"]][element["name"] + "v" + element["version"]].append(element["addr"] + ":" + str(element["port"]))
+                    struct[element["type"]][element["name"] + "~~" + element["version"]].append(element["addr"] + ":" + str(element["port"]))
     return struct
 
 def createApisLocations(string, apis, settings):
     for api in apis:
-        apiName = api.split("v")[0]
-        version = api.split("v")[1]
+        apiName = api.split("~~")[0]
+        version = api.split("~~")[1]
 	string += "\r\nlocation /api/" + apiName + "/" + version + " {\r\n"
         string += "\tproxy_pass http://" + settings["project_name"] + "-" + api+ "/;\r\n"
 	string += "\tinclude " + settings["nginx_path"] + settings["project_name"] + "/proxy/" + apiName +";\r\n"
@@ -54,8 +54,8 @@ def clusterConf(config, settings):
 
 def createPagesLocations(string, pages, settings):
     for page in pages:
-        pageName = page.split("v")[0]
-        version = page.split("v")[1]
+        pageName = page.split("~~")[0]
+        version = page.split("~~")[1]
 	string += "\r\nlocation /"
 	if pageName != "index" and version != "current":
 	    string += pageName + "/" + version
