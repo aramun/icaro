@@ -18,13 +18,12 @@
                 "X-Forwarded-Proto $scheme"
             ]
         }
-    }, 
+    },
     "containers": [
         {
 	    "packages":["oracle"],
             "apis": [
                 {
-                    "addr": "local", 
                     "cache_profile": "default_cache", 
                     "config_profile": "default", 
                     "name": "api1", 
@@ -35,7 +34,6 @@
                     "current_version": "1.2"
                 }, 
                 {
-                    "addr": "local", 
                     "cache_profile": "default_cache", 
                     "config_profile": "default", 
                     "name": "api3", 
@@ -53,7 +51,6 @@
             "nodes": 2, 
             "pages": [
                 {
-                    "addr": "local", 
                     "cache_profile": "default_cache", 
                     "config_profile": "default", 
                     "name": "index", 
@@ -66,7 +63,6 @@
 	    "packages":["oracle"],
             "apis": [
                 {
-                    "addr": "local", 
                     "cache_profile": "default_cache", 
                     "config_profile": "default", 
                     "name": "api2", 
@@ -84,7 +80,6 @@
             "nodes": 1, 
             "pages": [
                 {
-                    "addr": "local", 
                     "cache_profile": "default_cache", 
                     "config_profile": "default", 
                     "name": "report", 
@@ -97,5 +92,10 @@
     "listen_port": 8090, 
     "nginx_path": "/etc/nginx/", 
     "project_name": "sesto",
-    "virtualarea": "~/icaro/"
+    "virtualarea": "~/icaro/",
+    "proxy":{
+    	"http": "",
+	"https": "",
+	"ftp": ""
+    }
 }

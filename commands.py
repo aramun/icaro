@@ -1,13 +1,13 @@
 import sys 
 import json 
 import os 
-from core.run import build 
-from core.run import shut
+import core.run as core 
 import monitor.monitor as monitor
 import core.utils as utils 
 import controller.main as controller
 import controller.versioning as versioning
 import monitor.monitor as monitor
+import controller.testing as testing
 
 
 def selfLocation(): 
@@ -21,9 +21,18 @@ def createProject():
     utils.createFolder(project_name)
     utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4, sort_keys=True))
 
-def buildProject(): 
+def buildAll(): 
     settings = json.loads(utils.readLines("settings.json"))
-    build(settings)# --> quando abbiamo le opzioni di logging logghiamo qua
+    core.buildAll(settings)# --> quando abbiamo le opzioni di logging logghiamo qua
+    print "Build Success!"
+    os.system("chmod -R 777 .")
+    os.system("service nginx restart")
+    runAll("apis")
+    runAll("pages")
+
+def build(containerName):
+    settings = json.loads(utils.readLines("settings.json"))
+    core.build(settings, containerName)# --> quando abbiamo le opzioni di logging logghiamo qua
     print "Build Success!"
     os.system("chmod -R 777 .")
     os.system("service nginx restart")
@@ -36,9 +45,9 @@ def update(args):
     settings = json.loads(utils.readLines("settings.json"))
     controller.update(settings, type, element)
 
-def shutProject(): 
+def shutAll(): 
     settings = json.loads(utils.readLines("settings.json"))
-    shut(settings)
+    core.shut(settings)
 
 def startMonitor(): 
     monitor.start()
@@ -86,6 +95,11 @@ def addversion(args):
     version = args.split(",")[2]
     settings = json.loads(utils.readLines("settings.json"))
     print versioning.addversion(settings, type, element, version)
+
+def test(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    print testing.test(type, element)
 
 def htop(args):
     containerName = args.split(",")[0]

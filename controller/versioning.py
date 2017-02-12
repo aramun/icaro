@@ -51,9 +51,16 @@ def addversion(settings, type, element, version):
         elem = getElement(settings, type, element)
         elem["versions"].append(version)
         utils.fileWrite("settings.json", json.dumps(settings, indent = 4))
+        commit(settings, type, element, version)
         if confirmation("Do you want checkout in the new version?"):
             checkout(settings, type, element, version)
     else:
         if confirmation("Version already exists, do you wanna checkout?"):
             checkout(settings, type, element, version)
+
+def commit(settings, type, element):
+    versions_arr = versions(settings, type, element)
+    virtualarea = settings["virtualarea"].replace("~", utils.getHome()) + settings["project_name"]
+    commit_message = raw_input("Version " + version + "'s commit message: ") #bisogna far aprire il tuo editor predefinito e creare un linuaggio di markup per i messaggi di commit
+    utils.fileWrite(virtualarea + "/" + type + "/" + element + "/" + version + "/commit.icaro", commit_message)
 
