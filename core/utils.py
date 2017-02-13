@@ -31,22 +31,16 @@ def jsonArrayUpdate(source, key, val):
     for obj in content:
         obj[key] = val
     fileWrite(source, json.dumps(content))
-
-def get_tar_byte(source):
-    with tarfile.open("api.tar.gz", "w:gz") as tar:
-        tar.add(source, arcname=os.path.basename(source))
-    with open("api.tar", "rb") as binary_file:
-        return binary_file.read()
     
-
 def createFolder(path):
 	if not os.path.exists(path):
 		os.mkdir(path)
 
-def fileWrite(file,content):
-	file = open(file, "w")
-	file.write(content)
-	file.close()
+def fileWrite(file, content):
+    mkDir(os.path.dirname(file))
+    file = open(file, "w")
+    file.write(content)
+    file.close()
 
 def importer(source, destination):
 	fileWrite(destination,readLines(source))

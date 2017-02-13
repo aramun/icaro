@@ -8,6 +8,7 @@ import containers
 import workarea
 from virtualarea import Virtualarea
 from container import Container
+from monitor import Monitor
 
 
 def buildAll(settings):
@@ -20,7 +21,8 @@ def buildAll(settings):
 	workarea.genFiles(container, "pages")
     virtualarea.create()
     built = containers.runContainers(settings, virtualarea.path)
-    createMonitor(virtualarea.path + settings["project_name"], built)
+    monitor = Monitor(virtualarea)
+    monitor.create(built)#errore da risolvere
     clusters = nginx.clusterConf(built, settings)
     nginx.mkServer(settings, clusters)
     return built

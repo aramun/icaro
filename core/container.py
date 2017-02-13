@@ -19,8 +19,6 @@ class Container:
 
     def build(self):
         print "Building " + self.name + "..."
-        print self.path
-        print os.path.exists(self.path)
         return self.client.images.build(path = self.path)
 
     def run(self):
@@ -33,7 +31,7 @@ class Container:
         print "Running " + self.name + "..."
         addr = self.client.containers.get(containerDocker.id).attrs["NetworkSettings"]["IPAddress"]
         status = containerDocker.status
-        utils.jsonArrayUpdate(self.virtualarea + "/" + self.name + "/config.icaro", "addr", addr)
+        utils.jsonArrayUpdate(self.path + "config.icaro", "addr", addr)
         return {"addr": addr, "status": status}
 
     def shut(self):
