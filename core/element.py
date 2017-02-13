@@ -24,6 +24,7 @@ class Element:
 
     def set_port_to_version(self, port, version):
         return {
+                'id': self.node.id, 
                 'type': self.type,
                 'port': port,
                 'name': self.name,

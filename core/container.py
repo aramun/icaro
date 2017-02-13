@@ -32,7 +32,7 @@ class Container:
         addr = self.client.containers.get(containerDocker.id).attrs["NetworkSettings"]["IPAddress"]
         status = containerDocker.status
         utils.jsonArrayUpdate(self.path + "config.icaro", "addr", addr)
-        return {"addr": addr, "status": status}
+        return {"addr": addr, "status": status, "node": self.node}
 
     def shut(self):
         try:

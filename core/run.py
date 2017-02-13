@@ -22,7 +22,7 @@ def buildAll(settings):
     virtualarea.create()
     built = containers.runContainers(settings, virtualarea.path)
     monitor = Monitor(virtualarea)
-    monitor.create(built)#errore da risolvere
+    monitor.create(built)
     clusters = nginx.clusterConf(built, settings)
     nginx.mkServer(settings, clusters)
     return built

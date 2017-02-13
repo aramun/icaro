@@ -8,10 +8,10 @@ class Monitor:
     def create(self, built):
         for container in built:
             for node in built[container]:
-                elements = json.loads(utils.readLines(self.path + container + "/config.icaro"))
+                elements = json.loads(utils.readLines(self.path + container + "-" + str(node["node"]) + "/config.icaro"))
                 node["elements"] = elements
-        utils.fileWrite(self.path + "monitor.icaro", json.dumps(containers))
-        return containers
+        utils.fileWrite(self.path + "monitor.icaro", json.dumps(built))
+        return built
 
     def update(self):
         pass
