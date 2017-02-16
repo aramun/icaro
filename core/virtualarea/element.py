@@ -1,6 +1,6 @@
 import os
 import shutil
-import utils
+import icaro.core.utils as utils
 import icaro.controller.packages as packages
 
 class Element:

@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 import uuid
-import utils
+import icaro.core.utils as utils
 from container import Container
     
 def runContainers(settings, virtualarea):

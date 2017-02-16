@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import docker
 import uuid
-import utils
+import icaro.core.utils as utils
 
 class Container:
     def __init__(self, project_name, virtualarea, container, node):

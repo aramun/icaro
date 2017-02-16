@@ -1,4 +1,4 @@
-import utils
+import icaro.core.utils as utils
 import os
 
 def genWidget(name):

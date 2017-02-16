@@ -1,5 +1,5 @@
 import json
-import utils
+import icaro.core.utils as utils
 
 class Monitor:
     def __init__(self, virtualarea):

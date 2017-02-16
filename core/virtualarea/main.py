@@ -1,4 +1,4 @@
-import utils
+import icaro.core.utils as utils
 from node import Node
 
 class Virtualarea:

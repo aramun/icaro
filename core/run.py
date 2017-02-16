@@ -6,10 +6,10 @@ import re
 import nginx
 import containers
 import workarea
-from virtualarea import Virtualarea
-from container import Container
-from monitor import Monitor
-from nginx import Nginx
+from virtualarea.main import Virtualarea
+from virtualarea.container import Container
+from virtualarea.monitor import Monitor
+from nginx.main import Nginx
 
 
 def buildAll(settings):
