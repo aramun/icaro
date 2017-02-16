@@ -45,8 +45,7 @@ class Element:
                 shutil.rmtree(self.dir + folder)
 
     def gen_folders(self):
-        print "Generating VirtualArea' s element - " + self.name
-        print self.node.dir
+        print "Generating VirtualArea's element - " + self.name 
         utils.mkDir(self.dir)
         self.work_to_virtual()
         packages.include(self.packages, self.node.path)

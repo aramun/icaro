@@ -9,11 +9,11 @@ import workarea
 from virtualarea import Virtualarea
 from container import Container
 from monitor import Monitor
+from nginx import Nginx
 
 
 def buildAll(settings):
-    #portController(settings["listen_port"])-> funziona il controllo ma se ricarico il progetto rileva ovviamente che la porta e occupata
-    nginx.proxyConf(settings)
+    #portController(settings["listen_port"])-> funziona il controllo ma se ricarico il progetto rileva ovviamente che la porta e occupata 
     virtualarea = Virtualarea(settings)
     workarea.genFolders()
     for container in settings["containers"]:
@@ -23,8 +23,7 @@ def buildAll(settings):
     built = containers.runContainers(settings, virtualarea.path)
     monitor = Monitor(virtualarea)
     monitor.create(built)
-    clusters = nginx.clusterConf(built, settings)
-    nginx.mkServer(settings, clusters)
+    Nginx(virtualarea, built).build()
     return built
 
 def build(settings, containerName):
