@@ -1,16 +1,12 @@
 import sys 
 import json 
-import os 
-import core.run as core 
-import monitor.monitor as monitor
-import core.utils as utils 
-import controller.main as controller
-import controller.versioning as versioning
-import monitor.monitor as monitor
-import controller.testing as testing
+import os
+from controller.main import Controller
+from controller.versioning import VersionController
 
+controller = Controller()
 
-def selfLocation(): 
+def selfLocation():
     return os.path.dirname(os.path.realpath(__file__))
 
 def createProject(): 
@@ -22,79 +18,65 @@ def createProject():
     utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4, sort_keys=True))
 
 def buildAll(): 
-    settings = json.loads(utils.readLines("settings.json"))
-    core.buildAll(settings)# --> quando abbiamo le opzioni di logging logghiamo qua
+    controller.build_all()
     print "Build Success!"
     os.system("chmod -R 777 .")
     os.system("service nginx restart")
-    runAll("apis")
-    runAll("pages")
+    controller.run_all()
 
 def build(containerName):
-    settings = json.loads(utils.readLines("settings.json"))
-    core.build(settings, containerName)# --> quando abbiamo le opzioni di logging logghiamo qua
+    controller.build(containerName)
     print "Build Success!"
     os.system("chmod -R 777 .")
     os.system("service nginx restart")
-    runAll("apis")
-    runAll("pages")
+    controller.run(containerName)
 
-def update(args): 
+def upgrade(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
-    settings = json.loads(utils.readLines("settings.json"))
-    controller.update(settings, type, element)
+    controller.upgrade(type, element)
 
 def shutAll(): 
-    settings = json.loads(utils.readLines("settings.json"))
     core.shut(settings)
 
 def startMonitor(): 
-    monitor.start()
+    pass
 
 def runAll(args):
     type = args.split(",")[0] 
-    settings = json.loads(utils.readLines("settings.json"))
     controller.runAll(settings, type)
 
 def run(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
-    settings = json.loads(utils.readLines("settings.json"))
-    controller.run(settings, type, element)
+    controller.run(type, element)
 
 def whereismyelement(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
-    settings = json.loads(utils.readLines("settings.json"))
-    print controller.whereismyelement(settings, type, element)
+    print controller.whereismyelement(type, element)
 
 def versions(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
-    settings = json.loads(utils.readLines("settings.json"))
-    for version in versioning.versions(settings, type, element):
-        print version + "\n\t"
+    print VersionController(controller.virtualarea, type, element).versions()
 
 def current(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
-    settings = json.loads(utils.readLines("settings.json"))
-    print versioning.current_version(settings, type, element)
+    print VersionController(controller.virtualarea, type, element).current_version()
 
 def checkout(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
     version = args.split(",")[2]
-    settings = json.loads(utils.readLines("settings.json"))
-    print versioning.checkout(settings, type, element, version)
+    print VersionController(controller.virtualarea, type, element).checkout(version)
 
 def addversion(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
     version = args.split(",")[2]
-    settings = json.loads(utils.readLines("settings.json"))
-    print versioning.addversion(settings, type, element, version)
+    print VersionController(controller.virtualarea, type, element).addversion(version)
 
 def test(args):
     type = args.split(",")[0]

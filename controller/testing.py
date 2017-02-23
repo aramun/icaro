@@ -1,8 +1,8 @@
 import os
 import subprocess
+from icaro.core.element import Element
 
-def test(type, api):
-    port = raw_input("Insert port to run: ")
-    command = "uwsgi --enable-threads --http-socket 127.0.0.1:" + port  + " --wsgi-file " + type + "/" + api + ".py --callable api"
-    return subprocess.Popen(command.split(" "), stdout=subprocess.PIPE).communicate()[0]
+def test(controller, type, elementName):
+    element = controller.virtualarea.get_element(type, elementName)
+    element.test()
 

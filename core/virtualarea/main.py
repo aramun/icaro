@@ -1,12 +1,13 @@
 import icaro.core.utils as utils
 from node import Node
+from element import Element
 
 class Virtualarea:
     def __init__(self, settings):
         self.project_name = settings["project_name"]
         self.path = settings["virtualarea"].replace("~", utils.getHome()) + self.project_name + '/'
         self.settings = settings
-        self.containers = settings["containers"] 
+        self.containers = settings["containers"]
         self.proxy = settings["proxy"]
 
     def get_containers(self, nodes = False):
@@ -25,8 +26,32 @@ class Virtualarea:
                 containers.append(Node(self, container, 0))
         return containers
 
+    def get_element(self, type, elementName):
+        for container in self.get_containers():
+            for element in container.get_elements_by_type(type):
+                if elementName == element["name"]:
+                    return Element(container, element)
+        return None
+    
+    def get_containers_by_element(self, element):
+        """Input -> element obj
+            ....
+        """
+        nodes = []
+        for container in self.get_containers():
+            for element_dict in container.get_elements_by_type(element.type):
+                if element.name == element_dict["name"]:
+                    nodes += Node(self, container.container, 0).get_nodes()
+        return nodes
+
+    def get_all_elements(self):
+        """Returns all element's object in the project """
+        elements = []
+        for container in self.get_containers():
+            elements += container.get_all_obj_elements()
+        return elements
+
     def create(self):
-        from element import Element
         for container in self.containers:
             for node in range(0, container["nodes"]):
                 node = Node(self, container, node)

@@ -2,47 +2,110 @@ import os
 import shutil
 import icaro.core.utils as utils
 import icaro.controller.packages as packages
+import docker
+import subprocess
+from monitor import Monitor
+from version import Version
 
 class Element:
     def __init__(self, node, element):
+        self.settings = node.settings
         self.type = element["type"]
         self.name = element["name"]
+        self.dict = element
         self.current = element["current_version"]
         self.node = node
-        self.dir = node.path + self.type + '/' + self.name + "/"
-        self.virtualarea = self.dir + self.current + '/'
+        self.internal_path = self.type + '/' + self.name + "/"
+        self.dir = node.path + self.internal_path + '/'
         self.container = node.container
         self.workarea = self.type + "/"
         self.versions = element["versions"]
         self.packages = node.container["packages"]
 
+    def __get_index(self):
+        """get node list index into "type" settings """
+        i = 0
+        for element in self.settings["containers"][self.node.get_index()][self.type]:
+            if element["name"] == self.name:
+                return i
+            i += 1
+
+    def get_nodes(self):
+        """Get all nodes object of my element's container"""
+        return self.node.virtualarea.get_containers_by_element(self)
+    
+    def get_element_in_nodes(self):
+        """Return elements obj array contained in all nodes"""
+        elements = []
+        for node in self.get_nodes():
+            elements.append(Element(node, self.dict))
+        return elements
+
+    def get_version(self, version):
+        """Get versions obj of this element"""
+        return Version(self, version)
+
+    def where_am_i(self):
+        """Get all container names where is my element"""
+        nodes_name = []
+        for node in self.get_nodes():
+            nodes_name.append(node.name)
+        return nodes_name
+
+    def update(self, key, value):
+        """Update attribute in settings container -> element"""
+        self.settings["containers"][self.node.get_index()][self.type][__get_index()][key] = value
+        utils.fileWrite("settings.json", json.dumps(self.settings.__dict__, indent = 4))
+
     def work_to_virtual(self):
-        utils.importer(self.workarea + self.name + ".py", self.virtualarea + self.name + ".py")
+        """Upload element's current version to virtual area"""
+        for element in self.get_element_in_nodes():
+            element.get_version(self.current).work_to_virtual()
 
     def virtual_to_work(self):
-        utils.importer(self.virtualarea + self.name + ".py", self.workarea + self.name + ".py")
-
-    def set_port_to_version(self, port, version):
-        return {
-                'id': self.node.id, 
-                'type': self.type,
-                'port': port,
-                'name': self.name,
-                'version': version,
-                'current_version': self.current
-              }
+        """Download element's current version to workarea"""
+        for element in self.get_element_in_nodes():
+            element.get_version(self.current).virtual_to_work()
+    
+    def upgrade(self):
+        """Upgrade all element's versions"""
+        for element in self.get_element_in_nodes():
+            element.get_version(self.current).upgrade()
 
     def set_port_to_versions(self, port):
+        """set port to all versions"""
         config = []
         for version in self.versions:
-            config.append(self.set_port_to_version(port, version))
+            version = Version(self, version)
+            config.append(version.set_port(port))
             port += 1
         return config
 
     def clean_versions(self):
+        """Clean all versions, that are not present in settings, from virtualarea """
         for folder in os.listdir(self.dir):
             if not folder in self.versions:
-                shutil.rmtree(self.dir + folder)
+                Version(self, folder).clean()
+
+    def run(self, version):
+        for element in self.get_element_in_nodes():
+            element.get_version(version).run()
+
+    def run_all_versions(self):
+        """Run all version of this element"""
+        for version in self.versions:
+            self.run(version)
+
+    def shut_all_versions(self):
+        """Shut all version of this element"""
+        for version in self.versions:
+            self.get_version(version).shut()
+
+    def test(self):
+        """Run in localhost my version"""
+        port = raw_input("Insert port to run: ")
+        command = "uwsgi --enable-threads --http-socket 127.0.0.1:" + port  + " --wsgi-file " + self.element.type + "/" + self.element.name + ".py --callable api"
+        return subprocess.Popen(command.split(" "), stdout=subprocess.PIPE).communicate()[0]
 
     def gen_folders(self):
         print "Generating VirtualArea's element - " + self.name 

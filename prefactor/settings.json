@@ -21,7 +21,7 @@
     },
     "containers": [
         {
-	    "packages":["oracle"],
+	    "packages":["icaro"],
             "apis": [
                 {
                     "cache_profile": "default_cache", 
@@ -60,7 +60,7 @@
             ]
         }, 
         {
-	    "packages":["oracle"],
+	    "packages":["icaro"],
             "apis": [
                 {
                     "cache_profile": "default_cache", 

@@ -6,78 +6,88 @@ import icaro.core.utils as utils
 import versioning
 import tarfile
 import distutils.dir_util as dir_util
-import docker
-
-def getElement(settings, type, element):
-    elements = []
-    virtualarea = settings["virtualarea"].replace("~", utils.getHome())
-    containers = json.loads(utils.readLines(virtualarea + settings["project_name"] + "/monitor.icaro"))
-    for container in containers:
-        i = 0
-        for node in containers[container]:
-            for nodeElement in node["elements"]:
-                if type == nodeElement["type"] and element == nodeElement["name"]:
-                    nodeElement["container"] = settings["project_name"] + "-" + container + "-" + str(i)
-                    elements.append(nodeElement)
-            i+=1
-    return elements
+from icaro.core.virtualarea.workarea import Workarea
+from icaro.core.virtualarea.main import Virtualarea
+from icaro.core.virtualarea.container import Container
+from icaro.core.virtualarea.monitor import Monitor
+from icaro.core.nginx.main import Nginx
 
 
-def run(settings, type, element):
-    element = getElement(settings, type, element)
-    client = docker.from_env()  
-    for node in element:
-        print "Runnning "+ type +": "+ node["name"] + " version " + node["version"] + "..."
-        cmd = "uwsgi --enable-threads --http-socket 0.0.0.0:" + str(node["port"]) + " --wsgi-file " + node["type"] + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py --callable api"
-        container = client.containers.get(node["container"])
-        container.exec_run('pkill -9 -f "' + cmd + '"', stream = True, detach=True)
-        container.exec_run(cmd, stream = True, detach=True)
+class Controller:
+    def __init__(self):
+        self.settings = json.loads(utils.readLines("settings.json"))
+        self.virtualarea = Virtualarea(self.settings)
+        self.monitor = Monitor(self.virtualarea)
+        self.workarea = Workarea(self.virtualarea)
 
-def runAll(settings, type):
-    virtualarea = settings["virtualarea"].replace("~", utils.getHome())
-    destination = virtualarea + settings["project_name"]
-    containers = json.loads(utils.readLines(destination + "/monitor.icaro"))
-    for container in containers:
-        for element in containers[container][0]["elements"]:
-            run(settings, type, element["name"])
+    def run_containers(self):
+        containers = {}
+        for container in self.virtualarea.containers:
+            containers = self.run_container(container,track = containers)
+        return containers
 
-def whereismyelement(settings, type, element):
-    element = getElement(settings, type, element)
-    client = docker.from_env()
-    containers = []
-    for node in element:
-        container = client.containers.get(node["container"])
-        if not container.name in containers:
-            containers.append(container.name)
-    return json.dumps(containers)
+    def run_container(self, container, track = {}):
+        track[container["name"]] = []
+        for node in range(0, container["nodes"]):
+            container_obj = Container(self.settings["project_name"], self.virtualarea, container, node)
+            container_obj.shut()
+            track[container["name"]].append(container_obj.run())
+        return track
 
-def htop(containerName):
-    client = docker.from_env()
-    container = client.containers.get(containerName)
-    top = container.top(ps_args="aux")
-    processes = []
-    for process in top["Processes"]:
-        obj = {}
-        i = 0
-        for title in top["Titles"]:
-            obj[title] = process[i] 
-            i+=1
-        processes.append(obj)
-    return json.dumps(processes, indent=2)
+    def __tree_build(self):
+        """
+        Scope:
+            Build virtualarea and workarea folder
+        """
+        self.workarea.gen_folders
+        self.workarea.gen_files
+        self.virtualarea.create()
 
-def update(settings, type, element):
-    node_list = getElement(settings, type, element)
-    virtualarea = settings["virtualarea"].replace("~", utils.getHome()) + settings["project_name"]
-    client = docker.from_env()
-    for node in node_list:
-        if node["version"] == versioning.current_version(settings, type, element):
-            container_endpoint = node["container"] + ":/usr/src/app/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py"
-            utils.importer(type + "/" + node["name"] + ".py", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/" + type + "/" + node["name"] + "/" + node["version"] + "/" + node["name"] + ".py" )
-            if type == "pages":
-                dir_util.copy_tree("widgets", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/widgets")
-                dir_util.copy_tree("pages/libraries", virtualarea + "/" + "-".join(node["container"].split("-")[1:]) + "/pages/libraries")
-                os.system("sudo docker cp widgets " + node["container"] + ":/usr/src/app")
-                os.system("sudo docker cp pages/libraries " + node["container"] + ":/usr/src/app/pages")
-            os.system("sudo docker cp " + type + "/" + node["name"] + ".py" + " " + container_endpoint)
-        print run(settings, type, element)
+    def build_all(self):
+        """
+        Output -> json built
+        Scope:
+            Build all containers creating monitor and building nginx
+        """
+        self.__tree_build()
+        built = self.run_containers()
+        self.monitor.create(built)
+        Nginx(self.virtualarea, built).build()
+        return built
+
+    def build(self, container):
+        """
+        Input -> Node obj
+        Output -> json built
+        Scope:
+            Build a single container creating monitor and building nginx
+        """
+        self.__tree_build()
+        built = self.run_container()
+        self.run(container)
+        self.monitor.update(built)
+        Nginx(self.virtualarea, self.monitor.get()).build()
+        return built
+
+    def whereismyelement(self, type, elementName):
+        """Return list of node name"""
+        containers = self.virtualarea.get_element(type, elementName).where_am_i()
+        return json.dumps(containers)
+ 
+    def run(self, type, elementName, version):
+        element = self.virtualarea.get_element(type, elementName)
+        if version == "current":
+            element.run(element.current)
+        elif version == "all":
+            element.run_all_versions()
+        else:
+            element.run(version)
+
+    def run_all(self):
+        for element in self.virtualarea.get_all_elements():
+            element.run_all_versions()
+    
+    def upgrade(self, type, elementName):
+        """Upgrade element current version"""
+        self.virtualarea.get_element(type, elementName).upgrade() 
 

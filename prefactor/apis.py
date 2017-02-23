@@ -5,7 +5,6 @@ import requests
 import icaro.utils.security as security
 import icaro.core.utils as utils
 
-
 def my_action():
 	return {var:"mydata"}
 

@@ -19,3 +19,10 @@ class Monitor:
     def get(self):
         return json.loads(utils.readLines(self.path + "monitor.icaro"))
 
+    def find_element(self, containerName, elementName):
+        elements = []
+        for node in self.get()[containerName]:
+            for element in node["elements"]:
+                if elementName == element["name"]:
+                    elements.append(element)
+        return elements

@@ -12,7 +12,7 @@ class Container:
         self.node = node
         self.name = project_name + "-" + container["name"] + "-" + str(node)
         self.virtualarea = virtualarea
-        self.path = virtualarea + container["name"] + "-" + str(node) + '/'
+        self.path = self.virtualarea.path + container["name"] + "-" + str(node) + '/'
         self.mem_limit = container["memory_limit"]
         self.network_mode = "bridge"
         self.hostname = str(uuid.uuid4()) + "-host"
@@ -43,3 +43,17 @@ class Container:
         except(docker.errors.NotFound):
             print "Node not found"
         return self.name
+
+    def htop(self):
+        container = client.containers.get(self.name)
+        top = container.top(ps_args="aux")
+        processes = []
+        for process in top["Processes"]:
+            obj = {}
+            i = 0
+            for title in top["Titles"]:
+                obj[title] = process[i] 
+                i+=1
+            processes.append(obj)
+        return json.dumps(processes, indent=2)
+

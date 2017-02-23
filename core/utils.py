@@ -33,11 +33,12 @@ def jsonArrayUpdate(source, key, val):
     fileWrite(source, json.dumps(content))
     
 def createFolder(path):
-	if not os.path.exists(path):
-		os.mkdir(path)
+    if not os.path.exists(path):
+	os.mkdir(path)
 
 def fileWrite(file, content):
-    mkDir(os.path.dirname(file))
+    if os.path.dirname(file) != "":
+        mkDir(os.path.dirname(file))
     file = open(file, "w")
     file.write(content)
     file.close()
@@ -50,7 +51,7 @@ def mkDir(path):
 		os.makedirs(path)
 
 def insertIntoFile(offset1, stringToInsert, file):
-	content = readLines(file)
+        content = readLines(file)
 	if content.strip().find(stringToInsert.strip()) == -1:
 		n = content.find(offset1)
 		if n != -1:
