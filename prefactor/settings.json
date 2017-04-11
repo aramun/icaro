@@ -95,7 +95,21 @@
     "virtualarea": "~/icaro/",
     "proxy":{
     	"http": "",
-	"https": "",
-	"ftp": ""
+        "https": "",
+        "ftp": ""
+    },
+    {
+        "ssh_ip_address":"",
+        "ssh_port":22,
+        "ssh_username":"",
+        "ssh_password":"",
+        "ssh_remote_bind_ip_address":""
+        "ssh_remote_bind_port":9000,
+        "db_name":"",
+        "db_user":"",
+        "db_password":"",
+        "db_host":"",
+        "db_port":9000
     }
+
 }
