@@ -16,7 +16,7 @@ class Workarea:
             for element in container.get_all_elements():
                 self.folder_tree[element["type"]][element["name"]] = {}
 
-    def gen_widget(self, name):    
+    def gen_widget(self, name): 
 	utils.mkDir("widgets/" + name)
 	utils.mkDir("widgets/" + name + "/css")
 	utils.mkDir("widgets/" + name + "/js")

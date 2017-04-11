@@ -5,11 +5,11 @@ class Cluster:
         self.path = nginx.path + nginx.project_name + "/clusters/"
         self.name = element["name"] + "~~" + str(element["version"])
         self.addrs = element["addrs"]
-        self.element = element 
+        self.element = element
         self.nginx = nginx
 
     def write(self):
-        upstream = "upstream " + self.nginx.project_name + "-" + self.name + " { \r\n" 
+        upstream = "upstream " + self.nginx.project_name + "-" + self.name + " { \r\n"
         for addr in self.addrs:
             upstream += "server " + addr + ";"
         upstream += "}"

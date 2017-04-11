@@ -6,6 +6,7 @@ import icaro.core.utils as utils
 import versioning
 import tarfile
 import distutils.dir_util as dir_util
+import testing
 from icaro.core.virtualarea.workarea import Workarea
 from icaro.core.virtualarea.main import Virtualarea
 from icaro.core.virtualarea.container import Container
@@ -39,8 +40,8 @@ class Controller:
         Scope:
             Build virtualarea and workarea folder
         """
-        self.workarea.gen_folders
-        self.workarea.gen_files
+        self.workarea.gen_folders()
+        self.workarea.gen_files()
         self.virtualarea.create()
 
     def build_all(self):
@@ -73,7 +74,7 @@ class Controller:
         """Return list of node name"""
         containers = self.virtualarea.get_element(type, elementName).where_am_i()
         return json.dumps(containers)
- 
+
     def run(self, type, elementName, version):
         element = self.virtualarea.get_element(type, elementName)
         if version == "current":
@@ -86,8 +87,10 @@ class Controller:
     def run_all(self):
         for element in self.virtualarea.get_all_elements():
             element.run_all_versions()
-    
+
+    def test(self, type, elementName):
+        testing.test(self, type, elementName)
+
     def upgrade(self, type, elementName):
         """Upgrade element current version"""
-        self.virtualarea.get_element(type, elementName).upgrade() 
-
+        self.virtualarea.get_element(type, elementName).upgrade()

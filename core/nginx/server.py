@@ -1,5 +1,10 @@
 import icaro.core.utils as utils
 
+"""
+REMEMBER!!
+with final / the request body doesn't pass
+use only for page object
+"""
 
 class Server:
     def __init__(self, nginx, port, clusters):
@@ -24,11 +29,14 @@ class Server:
     def __create_pages_locations(self, pages):
         string = ""
         for page in pages:
+            print page["version"]+" "+page["current"]
 	    string += "\r\nlocation /"
-	    if page["name"] != "index" and page["version"] != "current":
-	        string += page["name"] + "/" + page["version"]
-            else:
-                string += page["version"]
+	    if page["name"] != "index" and page["version"] != page["current"]:
+	        string += page["name"] + "/" + page["version"] + "/"
+            elif page["version"] == page["current"] and page["name"] != "index":
+                string += page["name"] + "/"
+            elif page["version"] != page["current"] and page["name"] == "index":
+                string += page["version"] + "/"
 	    string += " {\r\n"
             string += self.__location_configuration(page)
 	    string += "}"

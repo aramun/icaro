@@ -47,8 +47,8 @@ def importer(source, destination):
 	fileWrite(destination,readLines(source))
 
 def mkDir(path):
-	if not os.path.exists(path):
-		os.makedirs(path)
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def insertIntoFile(offset1, stringToInsert, file):
         content = readLines(file)

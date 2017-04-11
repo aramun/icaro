@@ -3,6 +3,7 @@ from cluster import Cluster
 from proxy import Proxy
 from server import Server
 
+
 class Nginx:
     def __init__(self, virtualarea, built):
         self.path = virtualarea.settings["nginx_path"]
@@ -21,7 +22,8 @@ class Nginx:
                     if not name in struct[element["type"]]:
                         struct[element["type"]][name] = {"addrs":[element["addr"] + ":" + str(element["port"])],
                                                          "version": element["version"],
-                                                         "name": name.split("~~")[0]}
+                                                         "name": name.split("~~")[0],
+                                                         "current": element["current_version"]}
                     else:
                         struct[element["type"]][name]["addrs"].append(element["addr"] + ":" + str(element["port"]))
         return struct

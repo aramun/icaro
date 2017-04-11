@@ -8,7 +8,7 @@ import icaro.core.utils as utils
 
 class Container:
     def __init__(self, project_name, virtualarea, container, node):
-        self.client = docker.from_env()
+        self.client = docker.from_env(version='auto')
         self.node = node
         self.name = project_name + "-" + container["name"] + "-" + str(node)
         self.virtualarea = virtualarea

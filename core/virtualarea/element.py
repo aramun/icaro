@@ -4,6 +4,7 @@ import icaro.core.utils as utils
 import icaro.controller.packages as packages
 import docker
 import subprocess
+import json
 from monitor import Monitor
 from version import Version
 
@@ -16,7 +17,7 @@ class Element:
         self.current = element["current_version"]
         self.node = node
         self.internal_path = self.type + '/' + self.name + "/"
-        self.dir = node.path + self.internal_path + '/'
+        self.dir = node.path + self.internal_path
         self.container = node.container
         self.workarea = self.type + "/"
         self.versions = element["versions"]
@@ -33,7 +34,7 @@ class Element:
     def get_nodes(self):
         """Get all nodes object of my element's container"""
         return self.node.virtualarea.get_containers_by_element(self)
-    
+
     def get_element_in_nodes(self):
         """Return elements obj array contained in all nodes"""
         elements = []
@@ -54,8 +55,8 @@ class Element:
 
     def update(self, key, value):
         """Update attribute in settings container -> element"""
-        self.settings["containers"][self.node.get_index()][self.type][__get_index()][key] = value
-        utils.fileWrite("settings.json", json.dumps(self.settings.__dict__, indent = 4))
+        self.settings["containers"][self.node.get_index()][self.type][self.__get_index()][key] = value
+        utils.fileWrite("settings.json", json.dumps(self.settings, indent = 4))
 
     def work_to_virtual(self):
         """Upload element's current version to virtual area"""
@@ -66,7 +67,7 @@ class Element:
         """Download element's current version to workarea"""
         for element in self.get_element_in_nodes():
             element.get_version(self.current).virtual_to_work()
-    
+
     def upgrade(self):
         """Upgrade all element's versions"""
         for element in self.get_element_in_nodes():
@@ -104,11 +105,11 @@ class Element:
     def test(self):
         """Run in localhost my version"""
         port = raw_input("Insert port to run: ")
-        command = "uwsgi --enable-threads --http-socket 127.0.0.1:" + port  + " --wsgi-file " + self.element.type + "/" + self.element.name + ".py --callable api"
+        command = "uwsgi --enable-threads --http-socket 0.0.0.0:" + port + " --wsgi-file " + self.type + "/"+ self.name + "/" + self.name + ".py --callable api"
         return subprocess.Popen(command.split(" "), stdout=subprocess.PIPE).communicate()[0]
 
     def gen_folders(self):
-        print "Generating VirtualArea's element - " + self.name 
+        print "Generating VirtualArea's element - " + self.name
         utils.mkDir(self.dir)
         self.work_to_virtual()
         packages.include(self.packages, self.node.path)

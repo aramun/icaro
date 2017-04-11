@@ -1,6 +1,7 @@
 import json
 import icaro.core.utils as utils
 import main as controller
+import distutils
 import os
 
 def confirmation(message):
@@ -19,7 +20,7 @@ class VersionController:
         if virtualarea.get_element(type, element) != None:
             self.element = virtualarea.get_element(type, element)
         else:
-            print "Element doesn' t exists!" 
+            print "Element doesn' t exists!"
 
     def versions(self):
         return self.element.versions
@@ -30,8 +31,11 @@ class VersionController:
     def checkout(self, version):
         if version in self.versions():
             self.element.update("current_version", version)
-            self.element.virtual_to_work()
-            print "Checkout to version " + version 
+            try:
+                self.element.virtual_to_work()
+            except distutils.errors.DistutilsFileError as e:
+                print('This version is never been developt')
+            print("Checkout to version " + version)
         else:
             if confirmation("Version doesn't exists do you want add it?"):
                 self.addversion(version)
