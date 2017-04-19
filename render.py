@@ -40,6 +40,7 @@ def load_template(role, page, libraries):
 	template = build_footer(template, libraries["js"], page)
 	return jinja2.Template(template)
 
+
 class Static:
     def __init__(self, addrs, role, page):
         self.addrs = addrs
@@ -57,6 +58,7 @@ class Static:
             falcon.HTTP_403
             resp.body = "Access Denied"
 
+
 class Lib:
     def __init__(self, addrs):
         self.addrs = addrs
@@ -71,6 +73,35 @@ class Lib:
         else:
            falcon.HTTP_403
            resp.body = "Access Denied"
+
+
+class Media:
+    def __init__(self, media_widget, user):
+        self.media_folder = media_widget
+        self.user = user
+
+    def on_get(self, req, resp, media_name):
+        file = "widgets/" + self.media_widget + "/" + self.user + "/" + media_name
+        resp.status = falcon.HTTP_200
+        mime = magic.Magic(mime=True)
+        resp.content_type = mime.from_file(file)
+        resp.body = utils.readLines(file)
+
+
+class Upload:
+    def __init__(self, upload_widget, user):
+        self.media_folder = upload_widget
+        self.user = user
+
+    def on_post(self, req, resp, file_name):
+        resp.status = falcon.HTTP_200
+        file = "widgets/" + self.upload_widget + "/" + self.user + "/" + file_name
+        try:
+            utils.fileWrite(file_name, req.stream.read())
+            resp.body = "OK"
+        except Exception as e:
+            resp.body = "There was an error: " + e.message 
+
 
 class Page:
     def __init__(self, addrs, role, page, libraries, data):
