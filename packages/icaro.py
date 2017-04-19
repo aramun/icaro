@@ -21,7 +21,9 @@ def pip_lib():
               requests==2.12.4
               python-magic==0.4.12
               jinja2==2.8.1
-              cassandra-driver==3.8.1"""
+              cassandra-driver==3.8.1
+	      psycopg2==2.7.1
+	      sshtunnel==0.1.2"""
 
 def commands():
     return [

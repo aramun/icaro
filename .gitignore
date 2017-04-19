@@ -2,3 +2,4 @@
 *.pyc
 *.icaro
 *.orig
+.DS_Store/
