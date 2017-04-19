@@ -2,6 +2,7 @@ import psycopg2 as postgre
 from sshtunnel import open_tunnel
 import icaro.core.utils as utils
 import logging
+import psycopg2.extras
 
 class PostgreConnector():
     
@@ -58,6 +59,10 @@ class PostgreConnector():
         self.open_tunnel()
         self.__connect()
         return self.conn
+    
+    def get_connection_dict_cursor(self):
+        cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        return cur
 
     def close_connection(self):
         self.conn.close()
@@ -78,14 +83,3 @@ class PostgreConnector():
         self.conn = postgre.connect(database = self.db_name, user = self.db_user, password = self.db_password, host = self.db_host, port = database_port)
         logging.info("connection to postgres database succesfully created")
 
-
-db_config = {"db_name":"postgres", "db_user":"postgres", "db_password":"Lavazza38", "db_host":"localhost", "db_port":""}
-ssh_config = {"ssh_ip_address":"192.168.1.40", "ssh_port":22, "ssh_username":"mario", "ssh_password":"Lavazza38", "ssh_remote_bind_address":"localhost", "ssh_remote_bind_port":5432}
-connector = PostgreConnector(db_config, ssh_config)
-conn = connector.get_connection()
-cur = conn.cursor()
-cur.execute("select * from roles")
-rows = cur.fetchall()
-for row in rows:
-    print row[1]
-connector.close_connection()
