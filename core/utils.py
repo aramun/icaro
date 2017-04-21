@@ -60,6 +60,9 @@ def insertIntoFile(offset1, stringToInsert, file):
 			content = content[:n+1] + stringToInsert + content[n+1:]
 			fileWrite(file, content)
 
+def get_sql(file):
+    return readLines("sql/"+file)
+
 def line_prepender(filename, line):
     with open(filename, 'r+') as f:
         content = f.read()
