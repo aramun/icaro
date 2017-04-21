@@ -95,6 +95,12 @@ def htop(args):
     containerName = args.split(",")[0]
     print(controller.htop(containerName))
 
+def update():
+    print(controller.update())
+
+def clean(args):
+    type = args.split(",")[0]
+    controller.clean(type)
 
 def commandsManager(command):
     command.pop(0)

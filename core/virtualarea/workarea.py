@@ -5,13 +5,15 @@ import os
 
 class Workarea:
     def __init__(self, virtualarea):
-        self.folder_tree = {"apis": {}, 
+        self.folder_tree = {"apis": {},
                             "pages":{
                                 "libraries":{
                                     "css":{},
                                     "js":{}
                                 }
-                            }}
+                            },
+                            "sql": {}
+                            }
         for container in virtualarea.get_containers():
             for element in container.get_all_elements():
                 self.folder_tree[element["type"]][element["name"]] = {}

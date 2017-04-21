@@ -10,6 +10,7 @@ class Container:
     def __init__(self, project_name, virtualarea, container, node):
         self.client = docker.from_env(version='auto')
         self.node = node
+        self.project_name = project_name
         self.name = project_name + "-" + container["name"] + "-" + str(node)
         self.virtualarea = virtualarea
         self.path = self.virtualarea.path + container["name"] + "-" + str(node) + '/'
@@ -19,6 +20,7 @@ class Container:
 
     def build(self):
         print "Building " + self.name + "..."
+        #os.system("docker rmi $(docker images | grep "+self.project_name+")")
         return self.client.images.build(path = self.path)
 
     def run(self):

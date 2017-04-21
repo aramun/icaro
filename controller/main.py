@@ -84,6 +84,24 @@ class Controller:
         else:
             element.run(version)
 
+    def update(self):
+        """
+        Update workarea if settings it's been changed
+        """
+        self.workarea.gen_folders()
+        self.workarea.gen_files()
+        return "Update -> OK"
+
+    def clean(self, type):
+        """
+        Hard => clean virtual area and all containers
+        Soft => clean virtual area
+        """
+        if type == "hard":
+            os.system("rm -rf "+self.virtualarea.path)
+        elif type == "soft":
+            os.system("rm -rf "+self.virtualarea.path)
+
     def run_all(self):
         for element in self.virtualarea.get_all_elements():
             element.run_all_versions()

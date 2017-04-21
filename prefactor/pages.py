@@ -11,10 +11,12 @@ import icaro.core.utils as utils
 
 #role is the value that exit from your custom auth api
 # a role can be static assigned
+
 page = [
-	{"roles": ["all"], "widget": "menu"},
+	{"roles": ["all"], "widget": "dashboard_top"},
         {"roles": ["admin", "superadmin"], "widget":"grid"},
-        {"roles": ["admin", "superadmin"], "widget":"footer"}
+        {"roles": ["admin", "superadmin"], "widget":"footer"},
+	{"roles": ["all"], "widget": "dashboard_bottom"}
 ]
 
 libraries = {
