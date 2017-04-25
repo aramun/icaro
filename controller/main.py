@@ -12,14 +12,25 @@ from icaro.core.virtualarea.main import Virtualarea
 from icaro.core.virtualarea.container import Container
 from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
-
+from icaro.core.connectors.machine import Machine
+from icaro.validator.settings import valid
+from icaro.core.connectors.machine import Machine
 
 class Controller:
     def __init__(self):
-        self.settings = json.loads(utils.readLines("settings.json"))
+        self.settings = valid(json.loads(utils.readLines("settings.json")))
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
+
+    def __valid_machine(self, machine_name, node):
+        print "Validating "+machine_name+"..."
+        if machine_name != "local":
+            machine = Machine(self.settings["machines"][machine_name], machine_name, node)
+            if machine.check():
+                return machine
+        else:
+            return "local"
 
     def run_containers(self):
         containers = {}
@@ -30,7 +41,7 @@ class Controller:
     def run_container(self, container, track = {}):
         track[container["name"]] = []
         for node in range(0, container["nodes"]):
-            container_obj = Container(self.settings["project_name"], self.virtualarea, container, node)
+            container_obj = Container(self.settings["project_name"], self.virtualarea, container, node, self.__valid_machine(container["machine"], node))
             container_obj.shut()
             track[container["name"]].append(container_obj.run())
         return track
@@ -82,7 +93,28 @@ class Controller:
         elif version == "all":
             element.run_all_versions()
         else:
-            element.run(version)
+            element.run(version)        
+
+    def check_machines(self):
+        for machine_name, machine in self.settings["machines"].iteritems():
+            print("Checking "+machine_name+"...")
+            if Machine(machine, machine_name).check():
+                print machine_name+"-->OK"
+            else:
+                print "Machine configured but not turned on remote machine"
+
+    def __config_machine(self, machine_name, machine):
+        machine = Machine(machine, machine_name)
+        machine.configure(self.settings["server_addr"])
+
+    def config_machines(self):
+        """
+        Transport all connectors to relative machines
+        """
+        utils.mkDir(".connections")
+        for machine_name, machine in self.settings["machines"].iteritems():
+            print("Configuring "+machine_name+"...")
+            self.__config_machine(machine_name, machine)
 
     def update(self):
         """

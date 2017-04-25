@@ -5,9 +5,10 @@ import subprocess
 import docker
 import uuid
 import icaro.core.utils as utils
+import sys
 
 class Container:
-    def __init__(self, project_name, virtualarea, container, node):
+    def __init__(self, project_name, virtualarea, container, node, machine):
         self.client = docker.from_env(version='auto')
         self.node = node
         self.project_name = project_name
@@ -17,14 +18,33 @@ class Container:
         self.mem_limit = container["memory_limit"]
         self.network_mode = "bridge"
         self.hostname = str(uuid.uuid4()) + "-host"
+        self.machine = machine
+
 
     def build(self):
         print "Building " + self.name + "..."
         #os.system("docker rmi $(docker images | grep "+self.project_name+")")
         return self.client.images.build(path = self.path)
 
+    def clean_image(self):
+        print "Cleaning Image:" + self.name
+        try:
+            self.client.images.remove(self.name.lower()+":on-build", force=True)
+        except(docker.errors.ImageNotFound):
+            print "Image does not exits"
+
     def run(self):
-        containerDocker = self.client.containers.run(self.build().id,
+        if self.machine == "local":
+            return self.__local_run()
+        else:
+            return self.__remote_run()
+
+            
+    def __local_run(self):
+        self.clean_image()
+        self.image = self.build()
+        self.image.tag(self.name.lower(), "on-build")
+        containerDocker = self.client.containers.run(self.image.id,
                                                 detach = True,
                                                 name = self.name, 
                                                 hostname = self.hostname, 
@@ -35,6 +55,22 @@ class Container:
         status = containerDocker.status
         utils.jsonArrayUpdate(self.path + "config.icaro", "addr", addr)
         return {"addr": addr, "status": status, "node": self.node}
+
+    def __remote_run(self):
+        response = self.machine.send_file(self.path, "~/"+self.machine.name)["message"]
+        if len(response) == 0:
+            print "base:"+os.path.basename(os.path.normpath(self.path))
+            track = self.machine.run(os.path.basename(os.path.normpath(self.path)), self.hostname, self.mem_limit)
+            if track["status"]:
+                utils.jsonArrayUpdate(self.path + "config.icaro", "addr", track["message"]["addr"])
+                return track["message"]
+            else:
+                print track["message"]
+                sys.exit()
+        else:
+            print response
+            sys.exit()
+
 
     def shut(self):
         try:

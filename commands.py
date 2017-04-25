@@ -59,6 +59,9 @@ def whereismyelement(args):
     print(controller.whereismyelement(type, element))
 
 
+def check_machines():
+    print(controller.check_machines())
+
 def versions(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
@@ -95,8 +98,12 @@ def htop(args):
     containerName = args.split(",")[0]
     print(controller.htop(containerName))
 
+def config_machines():
+    print(controller.config_machines())
+
 def update():
     print(controller.update())
+
 
 def clean(args):
     type = args.split(",")[0]

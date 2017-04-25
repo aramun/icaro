@@ -4,7 +4,7 @@ import logging
 class SshTunnel:
 
     def __init__(self, ssh_tunnel_config):
-         """
+        """
             ssh_tunnel_config {
                 ssh_ip_address: ip address server to connect
                 ssh_port: port server to connect
@@ -25,8 +25,7 @@ class SshTunnel:
         self.ssh_remote_bind_port = ssh_tunnel_config["ssh_remote_bind_port"]
 
     def open_tunnel(self):
-        self.tunnel = open_tunnel((self.ssh_ip_address, self.ssh_port), ssh_username=self.ssh_username, 
-        ssh_password = self.ssh_password, remote_bind_address=(self.ssh_remote_bind_address, self.ssh_remote_bind_port))
+        self.tunnel = open_tunnel((self.ssh_ip_address, self.ssh_port), ssh_username=self.ssh_username, ssh_password = self.ssh_password, remote_bind_address=(self.ssh_remote_bind_address, self.ssh_remote_bind_port))
         self.tunnel.start()
         logging.info("tunnel ssh succesfully created and started")
         return True
