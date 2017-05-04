@@ -1,7 +1,6 @@
 import psycopg2 as postgre
-from sshtunnel import open_tunnel
 import icaro.core.utils as utils
-from icaro.core.utils.ssh_tunnel import SshTunnel
+from icaro.utils.ssh_tunnel import SshTunnel
 import logging
 import psycopg2.extras
 
@@ -32,13 +31,14 @@ class PostgreConnector():
         self.tunnel_mode = self.ssh_tunnel.open_tunnel()
         self.__connect()
         return self.conn
-    
+
     def get_connection_dict_cursor(self):
         cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return cur
 
     def close_connection(self):
-        self.conn.close()
+        if hasattr(self, "conn"):
+            self.conn.close()
         self.ssh_tunnel.close_tunnel()
 
     def get_db_connection(self):
@@ -52,7 +52,7 @@ class PostgreConnector():
     def __connect(self):
         database_port = self.db_port
         if self.tunnel_mode:
-            database_port = self.tunnel.local_bind_ports[0]
+            database_port = self.ssh_tunnel.tunnel.local_bind_ports[0]
         self.conn = postgre.connect(database = self.db_name, user = self.db_user, password = self.db_password, host = self.db_host, port = database_port)
         logging.info("connection to postgres database succesfully created")
 

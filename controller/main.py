@@ -7,6 +7,8 @@ import versioning
 import tarfile
 import distutils.dir_util as dir_util
 import testing
+import icaro.caching as caching
+from libs import LibsController
 from icaro.core.virtualarea.workarea import Workarea
 from icaro.core.virtualarea.main import Virtualarea
 from icaro.core.virtualarea.container import Container
@@ -14,7 +16,6 @@ from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
 from icaro.core.connectors.machine import Machine
 from icaro.validator.settings import valid
-from icaro.core.connectors.machine import Machine
 
 class Controller:
     def __init__(self):
@@ -22,6 +23,14 @@ class Controller:
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
+        self.__build_system()
+
+    def __build_system(self):
+        self.__sessions()
+
+    def __sessions(self):
+        if os.fork == 0:
+            os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file /usr/local/lib/python2.7/dist-packages/icaro/caching/manager.py --callable api --logto 127.0.0.1:1717")
 
     def __valid_machine(self, machine_name, node):
         print "Validating "+machine_name+"..."
@@ -31,6 +40,9 @@ class Controller:
                 return machine
         else:
             return "local"
+
+    def libs(self, command, query):
+        return getattr(LibsController(self.virtualarea), command)(query)
 
     def run_containers(self):
         containers = {}

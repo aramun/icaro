@@ -34,32 +34,40 @@ def ssh_send(machine, file_path, destination, directory="-r"):
     return {"status":True, "message":result}
 
 def checkPort(port):
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	result = sock.connect_ex(('127.0.0.1', port))
-	if result == 0:
-	    return True
-	else:
-	    return False
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('127.0.0.1', port))
+    if result == 0:
+        return True
+    else:
+        return False
 
 def selfLocation():
-	return os.path.dirname(os.path.realpath(__file__))
+    return os.path.dirname(os.path.realpath(__file__))
 
 def bin_readLines(path):
-	file = open(path, "r")
-	content = file.readlines()
-	file.close()
-	return "".join(content).decode('utf-8')
+    file = open(path, "r")
+    content = file.readlines()
+    file.close()
+    return "".join(content).decode('utf-8')
 
 def readLines(path):
-	file = open(path, "r")
-	content = file.readlines()
-	file.close()
-	return "".join(content)
+    file = open(path, "r")
+    content = file.readlines()
+    file.close()
+    return "".join(content)
+
+def merge_two_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
 
 def jsonUpdate(source, key, val):
     content = json.loads(readLines(source))
     content[key] = val
     fileWrite(source, json.dumps(content))
+
+def rmdir(path):
+    shutil.rmtree(path)
 
 def jsonArrayUpdate(source, key, val):
     content = json.loads(readLines(source))
@@ -86,24 +94,24 @@ def fileWrite(file, content):
     file.close()
 
 def importer(source, destination):
-	fileWrite(destination,readLines(source))
+    fileWrite(destination,readLines(source))
 
 def mkDir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
 def insertIntoFile(offset1, stringToInsert, file):
-        content = readLines(file)
-	if content.strip().find(stringToInsert.strip()) == -1:
-		n = content.find(offset1)
-		if n != -1:
-			while (content[n] != "{"):
-				n += 1
-			content = content[:n+1] + stringToInsert + content[n+1:]
-			fileWrite(file, content)
+    content = readLines(file)
+    if content.strip().find(stringToInsert.strip()) == -1:
+            n = content.find(offset1)
+            if n != -1:
+                    while (content[n] != "{"):
+                            n += 1
+                    content = content[:n+1] + stringToInsert + content[n+1:]
+                    fileWrite(file, content)
 
 def get_sql(file):
-    return readLines("sql/"+file)
+    return readLines("sql/"+file+".sql")
 
 def line_prepender(filename, line):
     with open(filename, 'r+') as f:
@@ -116,4 +124,4 @@ def copytree(source, destination):
         shutil.copytree(source, destination)
 
 def getHome():
-	return os.path.expanduser("~")
+    return os.path.expanduser("~")

@@ -41,24 +41,6 @@ def load_template(role, page, libraries):
 	return jinja2.Template(template)
 
 
-class Static:
-    def __init__(self, addrs, role, page):
-        self.addrs = addrs
-        self.role = role
-        self.page = page
-
-    def on_get(self, req, resp, widget, type, file):
-        if security.static(req, self.page, self.role, widget, self.addrs):
-            file = "widgets/" + widget + "/" + type + "/" +file
-            resp.status = falcon.HTTP_200
-            mime = magic.Magic(mime=True)
-            resp.content_type = mime.from_file(file)
-            resp.body = utils.readLines(file)
-        else:
-            falcon.HTTP_403
-            resp.body = "Access Denied"
-
-
 class Lib:
     def __init__(self, addrs):
         self.addrs = addrs
@@ -102,6 +84,22 @@ class Upload:
         except Exception as e:
             resp.body = "There was an error: " + e.message 
 
+class Static:
+    def __init__(self, addrs, role, page):
+        self.addrs = addrs
+        self.role = role
+        self.page = page
+
+    def on_get(self, req, resp, widget, type, file):
+        if security.static(req, self.page, self.role, widget, self.addrs):
+            file = "widgets/" + widget + "/" + type + "/" +file
+            resp.status = falcon.HTTP_200
+            mime = magic.Magic(mime=True)
+            resp.content_type = mime.from_file(file)
+            resp.body = utils.readLines(file)
+        else:
+            falcon.HTTP_403
+            resp.body = "Access Denied"
 
 class Page:
     def __init__(self, addrs, role, page, libraries, data):

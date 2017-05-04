@@ -113,6 +113,11 @@ class Element:
         utils.mkDir(self.dir)
         self.work_to_virtual()
         packages.include(self.packages, self.node.path)
+        import icaro.session as session
+        icaro_dir = os.path.dirname(session.__file__)
+        utils.mkDir(self.node.path+"icaro/icaro/session")
+        shutil.copyfile(icaro_dir+"/"+self.settings["session_engine"]+".py", self.node.path+"icaro/icaro/session/manager.py")
+        utils.fileWrite(self.node.path + "/icaro/icaro/session/__init__.py", "")
         self.clean_versions()
         if self.type == "pages":
             utils.copytree("widgets", self.node.path + "/widgets")

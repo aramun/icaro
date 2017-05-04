@@ -68,6 +68,7 @@ class Version:
         dir = self.element.workarea + self.element.name + "/"
         shutil.rmtree(dir)
         copy_tree(self.virtual_path, dir)
+        copy_tree(self.node.path + "/sql", "sql")
         if self.element.type == "pages":
             copy_tree(self.node.path + "/widgets", "widgets")
             copy_tree(self.node.path + "/pages/libraries", "pages/libraries")
@@ -76,6 +77,7 @@ class Version:
         """Upload version to virtual area"""
         dir = self.element.workarea + self.element.name + "/"
         copy_tree(dir, self.virtual_path)
+        copy_tree("sql", self.node.path + "/sql")
         if self.element.type == "pages":
             copy_tree("widgets", self.node.path + "/widgets")
             copy_tree("pages/libraries", self.node.path + "/pages/libraries")

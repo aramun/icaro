@@ -15,6 +15,7 @@ def buildAll():
     os.system("service nginx restart")
     if os.fork() != 0:
         os.system("uwsgi --udp 0.0.0.0:1717")
+        os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file /usr/local/lib/python2.7/dist-packages/icaro/caching/manager.py --callable api --logto 127.0.0.1:1717")
     controller.run_all()
 
 
@@ -62,6 +63,7 @@ def whereismyelement(args):
 def check_machines():
     print(controller.check_machines())
 
+
 def versions(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
@@ -88,6 +90,12 @@ def addversion(args):
     print(VersionController(controller.virtualarea, type, element).addversion(version))
 
 
+def libs(args):
+    type = args.split(",")[0]
+    element = args.split(",")[1]
+    print(controller.libs(type, element))
+
+
 def test(args):
     type = args.split(",")[0]
     element = args.split(",")[1]
@@ -98,8 +106,10 @@ def htop(args):
     containerName = args.split(",")[0]
     print(controller.htop(containerName))
 
+
 def config_machines():
     print(controller.config_machines())
+
 
 def update():
     print(controller.update())
@@ -108,6 +118,7 @@ def update():
 def clean(args):
     type = args.split(",")[0]
     controller.clean(type)
+
 
 def commandsManager(command):
     command.pop(0)

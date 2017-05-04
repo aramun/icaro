@@ -17,6 +17,7 @@ def dockerfile(packages):
     return result
 
 def include(packages, destination):
+    print destination
     for package in packages:
         module = importlib.import_module('icaro.packages.' + package)
         module.include(destination)

@@ -20,7 +20,6 @@ class Container:
         self.hostname = str(uuid.uuid4()) + "-host"
         self.machine = machine
 
-
     def build(self):
         print "Building " + self.name + "..."
         #os.system("docker rmi $(docker images | grep "+self.project_name+")")
@@ -39,16 +38,15 @@ class Container:
         else:
             return self.__remote_run()
 
-            
     def __local_run(self):
         self.clean_image()
         self.image = self.build()
         self.image.tag(self.name.lower(), "on-build")
         containerDocker = self.client.containers.run(self.image.id,
                                                 detach = True,
-                                                name = self.name, 
-                                                hostname = self.hostname, 
-                                                network_mode = self.network_mode, 
+                                                name = self.name,
+                                                hostname = self.hostname,
+                                                network_mode = self.network_mode,
                                                 mem_limit = self.mem_limit)
         print "Running " + self.name + "..."
         addr = self.client.containers.get(containerDocker.id).attrs["NetworkSettings"]["IPAddress"]
@@ -59,7 +57,6 @@ class Container:
     def __remote_run(self):
         response = self.machine.send_file(self.path, "~/"+self.machine.name)["message"]
         if len(response) == 0:
-            print "base:"+os.path.basename(os.path.normpath(self.path))
             track = self.machine.run(os.path.basename(os.path.normpath(self.path)), self.hostname, self.mem_limit)
             if track["status"]:
                 utils.jsonArrayUpdate(self.path + "config.icaro", "addr", track["message"]["addr"])
@@ -70,7 +67,6 @@ class Container:
         else:
             print response
             sys.exit()
-
 
     def shut(self):
         try:
