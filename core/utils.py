@@ -5,6 +5,7 @@ import json
 import tarfile
 import subprocess
 import sys
+import urlparse
 
 def ssh_execute(machine, command):
     bash = 'sshpass -p '+machine["password"]+' ssh -p'+str(machine["port"])+' '+machine["username"]+'@'+machine["addr"]+' '+command
@@ -33,6 +34,11 @@ def ssh_send(machine, file_path, destination, directory="-r"):
         return {"status":False, "message":error}
     return {"status":True, "message":result}
 
+
+def urldecode(url_data):
+    return dict(urlparse.parse_qsl(url_data))
+
+
 def checkPort(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     result = sock.connect_ex(('127.0.0.1', port))
@@ -57,6 +63,7 @@ def readLines(path):
     return "".join(content)
 
 def merge_two_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy."""
     z = x.copy()
     z.update(y)
     return z

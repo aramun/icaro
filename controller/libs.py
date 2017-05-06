@@ -21,9 +21,12 @@ class LibsController:
         clone_url = self.__search(repository, firstElement=True)["clone_url"]
         print("Downloading...")
         os.system("git clone "+clone_url+" .staging")
-        os.system("cp -a .staging/dist/. pages/libraries/")
+        if os.path.exists(".staging/dist/"):
+            os.system("cp -a .staging/dist/. pages/libraries/")
+        else:
+            return repository + " is not an integrable library"
         utils.rmdir(".staging")
-
+        return repository + " install success!!"
 
     def search(self, repository): 
         resp = self.__search(repository)

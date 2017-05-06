@@ -4,9 +4,9 @@ import os
 import icaro.core.utils as utils
 from controller.main import Controller
 from controller.versioning import VersionController
+import icaro.caching as caching
 
 controller = Controller()
-
 
 def buildAll():
     controller.build_all()
@@ -15,7 +15,6 @@ def buildAll():
     os.system("service nginx restart")
     if os.fork() != 0:
         os.system("uwsgi --udp 0.0.0.0:1717")
-        os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file /usr/local/lib/python2.7/dist-packages/icaro/caching/manager.py --callable api --logto 127.0.0.1:1717")
     controller.run_all()
 
 

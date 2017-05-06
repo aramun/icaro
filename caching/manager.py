@@ -60,8 +60,10 @@ class Cache:
         return "OK"
 
 class Set:
-    def on_get(self, req, resp, id, key, value):
-        resp.body = Cache(id).set(key, value)
+    def on_post(self, req, resp, id):
+        data = utils.urldecode(req.stream.read())
+        for key, value in data.iteritems():
+            resp.body = Cache(id).set(key, value)
 
 class Get:
     def on_get(self, req, resp, id, key):
@@ -78,7 +80,7 @@ class GetAll:
 
 api = falcon.API()
 
-api.add_route("/set/{id}&{key}={value}", Set())
+api.add_route("/set/{id}", Set())
 api.add_route("/get/{id}&{key}", Get())
 api.add_route("/destroy/{id}", Destroy())
 api.add_route("/get_all/{id}", GetAll())

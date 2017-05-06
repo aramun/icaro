@@ -23,14 +23,14 @@ class Controller:
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
-        self.__build_system()
+        
 
-    def __build_system(self):
-        self.__sessions()
-
-    def __sessions(self):
-        if os.fork == 0:
-            os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file /usr/local/lib/python2.7/dist-packages/icaro/caching/manager.py --callable api --logto 127.0.0.1:1717")
+    def __build_env(self):
+        if self.settings["session_engine"]=="icaro":
+            if os.fork() != 0:
+                os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file "+os.path.dirname(caching.__file__)+"/manager.py --callable api --logto 127.0.0.1:1717")
+        if os.fork() != 0:
+            os.system("uwsgi --udp 0.0.0.0:1717")
 
     def __valid_machine(self, machine_name, node):
         print "Validating "+machine_name+"..."
@@ -147,6 +147,7 @@ class Controller:
             os.system("rm -rf "+self.virtualarea.path)
 
     def run_all(self):
+        self.__build_env()
         for element in self.virtualarea.get_all_elements():
             element.run_all_versions()
 

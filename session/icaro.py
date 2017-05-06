@@ -34,7 +34,9 @@ class Session:
         self.data = json.loads(r.text)
  
     def set(self, data_key, data_value):
-        r = requests.get(self.addr+"/set/"+self.session_id+"&"+data_key+"="+data_value)
+        data = {}
+        data[data_key] = data_value
+        r = requests.post(self.addr+"/set/"+self.session_id, data = data)
         if self.in_memory:
             self.__put_in_memory()
         return r.text
