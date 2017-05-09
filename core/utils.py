@@ -9,7 +9,6 @@ import urlparse
 
 def ssh_execute(machine, command):
     bash = 'sshpass -p '+machine["password"]+' ssh -p'+str(machine["port"])+' '+machine["username"]+'@'+machine["addr"]+' '+command
-    print bash.split()
     ssh = subprocess.Popen(bash.split(),
                            shell=False,
                            stdout=subprocess.PIPE,
@@ -81,7 +80,7 @@ def jsonArrayUpdate(source, key, val):
     for obj in content:
         obj[key] = val
     fileWrite(source, json.dumps(content))
-    
+
 def createFolder(path):
     if not os.path.exists(path):
 	os.mkdir(path)
