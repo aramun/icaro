@@ -26,7 +26,7 @@ class Controller:
         
 
     def __build_env(self):
-        if self.settings["session_engine"]=="icaro":
+        if self.settings["session_engine"] == "icaro":
             if os.fork() != 0:
                 os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file "+os.path.dirname(caching.__file__)+"/manager.py --callable api --logto 127.0.0.1:1717")
         if os.fork() != 0:

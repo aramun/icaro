@@ -12,14 +12,20 @@ sys.setdefaultencoding("utf-8")
 def build_head(template, libraries, page):
 	template += '<html><head>'
 	for library in libraries:
-		template += '<link rel="stylesheet" href="lib/css/' + library + '">'
+            if library.find("http://") != -1 or library.find("https://") != -1:
+                template += '<link rel="stylesheet" href="' + library + '">'
+            else:
+                template += '<link rel="stylesheet" href="lib/css/' + library + '">'
 	for section in page:
-		template += '<link rel="stylesheet" href="static/' + section["widget"] + '/css/style.css">'
+            template += '<link rel="stylesheet" href="static/' + section["widget"] + '/css/style.css">'
 	template += '</head><body>'
 	return template
 
 def build_footer(template, libraries, page):
 	for library in libraries:
+            if library.find("http://") != -1 or library.find("https://") != -1:
+		template += '<script src="' + library + '"></script>'
+            else:
 		template += '<script src="lib/js/' + library + '"></script>'
 	for section in page:
 		template += '<script src="static/' + section["widget"] + '/js/main.js"></script>'

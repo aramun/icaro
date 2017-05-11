@@ -9,7 +9,8 @@ def __machines_validator(machines):
             sys.exit()
 
 def valid(settings):
-    __machines_validator(settings["machines"])
+    if settings["machines"]:
+        __machines_validator(settings["machines"])
     print "Machines --> OK"
     return settings
 
