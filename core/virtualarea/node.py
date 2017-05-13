@@ -5,6 +5,7 @@ import uuid
 import icaro.controller.packages as packages
 import icaro.controller.system as system
 from element import Element
+from icaro.core.langs_manager.lang import Lang
 
 class Node:
     def __init__(self, virtualarea, container, node):
@@ -73,7 +74,10 @@ class Node:
         
     def create_container(self):
         config = []
-        dockerfile = "FROM ubuntu\nFROM python:2.7-onbuild\n"
+        dockerfile = "FROM ubuntu\n"
+        for lang in self.get_all_langs_object():
+            for image in lang.images:
+                dockerfile += "FROM "+image+"\n"
         config = self.assign_element_port(8000)
         utils.fileWrite(self.path + "config.icaro", json.dumps(config))
         dockerfile += system.set_proxy(self.proxy, self.path)
@@ -85,8 +89,23 @@ class Node:
         dockerfile += packages.commands(self.packages)
         utils.fileWrite(self.path + "/Dockerfile", dockerfile)
 
+    def get_all_langs(self):
+        langs = []
+        for element in self.get_all_obj_elements():
+            lang = element.lang.name
+            if not lang in langs:
+                langs.append(lang)
+        return langs
+
+    def get_all_langs_object(self):
+        langs = []
+        for lang in self.get_all_langs():
+            langs.append(Lang(lang))
+        return langs
+
     def create_requirements(self):
-        utils.fileWrite(self.path + "requirements.txt", packages.pip_lib(self.packages))
+        for lang in self.get_all_langs_object():
+            utils.fileWrite(self.path + lang.requirements_file, packages.lib(self.packages))
 
     def controller(self):
         key = str(uuid.uuid4())

@@ -1,0 +1,8 @@
+{
+"pip":{
+    "requirements_file":"requirements.txt"
+},
+"maven":{
+    "requirements_file":"pom.xml"
+}
+}

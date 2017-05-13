@@ -15,11 +15,11 @@ from icaro.core.virtualarea.container import Container
 from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
 from icaro.core.connectors.machine import Machine
-from icaro.validator.settings import valid
+from icaro.validator.main import Validator
 
 class Controller:
     def __init__(self):
-        self.settings = valid(json.loads(utils.readLines("settings.json")))
+        self.settings = Validator().settings(utils.readLines("settings.json"))
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
@@ -73,6 +73,7 @@ class Controller:
         Scope:
             Build all containers creating monitor and building nginx
         """
+        Validator().machine(self.settings["machines"])
         self.__tree_build()
         built = self.run_containers()
         self.monitor.create(built)
@@ -86,6 +87,7 @@ class Controller:
         Scope:
             Build a single container creating monitor and building nginx
         """
+        Validator().machine(self.settings["machines"])
         self.__tree_build()
         built = self.run_container()
         self.run(container)

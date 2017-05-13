@@ -14,9 +14,7 @@ class Workarea:
                             },
                             "sql": {}
                             }
-        for container in virtualarea.get_containers():
-            for element in container.get_all_elements():
-                self.folder_tree[element["type"]][element["name"]] = {}
+        self.elements = virtualarea.get_all_elements()
 
     def gen_widget(self, name): 
 	utils.mkDir("widgets/" + name)
@@ -43,13 +41,12 @@ class Workarea:
         for folder in self.folder_tree:
             self.gen_tree(self.folder_tree[folder], folder)
 
-    def gen_files_by_type(self, type):
-        for element in self.folder_tree[type]:
-            path = type + "/" + element + "/" + element + ".py"
-	    if not os.path.isfile(path):
-	        utils.importer(os.path.abspath(os.path.join(utils.selfLocation(), os.pardir)) + "/prefactor/" + type + ".py", path)
+    def gen_file(self, name, type, lang):
+        path = type + "/" + name + "/" + name + ".py"
+        if not os.path.isfile(path):
+            utils.importer(os.path.abspath(os.path.join(utils.selfLocation(), os.pardir)) + "/prefactor/"+ lang +"/"+ type + ".py", path)
 
     def gen_files(self):
-        self.gen_files_by_type("apis")
-        self.gen_files_by_type("pages")
+        for element in self.elements:
+            self.gen_file(element.name, element.type, element.lang.name)
 

@@ -1,0 +1,10 @@
+{
+    "python":{
+        "docker_images":["python:2.7-onbuild"],
+        "library_manager":"pip"
+    },
+    "java":{
+        "docker_images":["java"],
+        "library_manager":"maven"
+    }
+}

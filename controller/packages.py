@@ -22,11 +22,11 @@ def include(packages, destination):
         module = importlib.import_module('icaro.packages.' + package)
         module.include(destination)
 
-def pip_lib(packages):
+def lib(packages):
     result = ""
     for package in packages:
         module = importlib.import_module('icaro.packages.' + package)
-        result += module.pip_lib()
+        result += module.lib()
     return result
 
 def commands(packages):

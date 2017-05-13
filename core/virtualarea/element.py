@@ -7,12 +7,14 @@ import subprocess
 import json
 from monitor import Monitor
 from version import Version
+from icaro.core.langs_manager.lang import Lang
 
 class Element:
     def __init__(self, node, element):
         self.settings = node.settings
         self.type = element["type"]
         self.name = element["name"]
+        self.lang = Lang(element["language"])
         self.dict = element
         self.current = element["current_version"]
         self.node = node

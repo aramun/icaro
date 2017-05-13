@@ -14,7 +14,7 @@ def include(destination):
 def dockerfile():
     return "COPY icaro /usr/local/lib/python2.7/site-packages\n" 
 
-def pip_lib():
+def lib():
     return """falcon==1.1.0 
               uwsgi==2.0.14
               requests==2.12.4
