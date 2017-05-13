@@ -1,10 +1,12 @@
 {
     "python":{
         "docker_images":["python:2.7-onbuild"],
-        "library_manager":"pip"
+        "library_manager":"pip",
+        "run_command":"uwsgi --enable-threads --http-socket 0.0.0.0:{port} --wsgi-file {path}{name}.py --callable api --logto 172.17.0.1:1717"
     },
     "java":{
-        "docker_images":["java"],
-        "library_manager":"maven"
+        "docker_images":["java:8"],
+        "library_manager":"maven",
+        "run_command":"java -Dserver.port={port} -jar {path}{name}.jar"
     }
 }
