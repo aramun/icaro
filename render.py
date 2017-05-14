@@ -9,8 +9,9 @@ import icaro.core.utils as utils
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-def build_head(template, libraries, page):
+def build_head(template, libraries, page, head):
 	template += '<html><head>'
+        template += head
 	for library in libraries:
             if library.find("http://") != -1 or library.find("https://") != -1:
                 template += '<link rel="stylesheet" href="' + library + '">'
@@ -32,10 +33,10 @@ def build_footer(template, libraries, page):
 	template += '</body></html>'
 	return template
 
-def load_template(role, page, libraries):
+def load_template(role, page, libraries, head = ""):
 	template = ""
 	body = ""
-	template = build_head(template, libraries["css"], page)
+	template = build_head(template, libraries["css"], page, head)
 	for section in page:
 		for section_role in section["roles"]:
 			if role == section_role:
@@ -108,16 +109,17 @@ class Static:
             resp.body = "Access Denied"
 
 class Page:
-    def __init__(self, addrs, role, page, libraries, data):
+    def __init__(self, addrs, role, page, libraries, data, head=""):
         self.addrs = addrs
         self.role = role
         self.page = page
         self.libraries = libraries
         self.data = data
+        self.head = head
 
     def on_get(self, req, resp):
         if security.page(req, self.addrs):
-            template = load_template(self.role, self.page, self.libraries)
+            template = load_template(self.role, self.page, self.libraries, self.head)
             resp.status = falcon.HTTP_200
             resp.content_type = 'text/html'
             resp.body = template.render(data = self.data)

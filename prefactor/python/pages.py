@@ -13,6 +13,11 @@ import magic
 #role is the value that exit from your custom auth api
 # a role can be static assigned
 
+head = """
+   <title>Title page</title> 
+   ....
+"""
+
 page = [
     {"roles": ["all"], "widget":"mywidget1"},
     {"roles": ["all"], "widget":"mywidget2"},
@@ -52,7 +57,7 @@ class Page:
     def on_get(self, req, resp):
         if security.page(req, None):
             data = get_data(Session(req, resp))
-            template = render.load_template(data["role"], page, libraries)
+            template = render.load_template(data["role"], page, libraries, head = head)
             resp.status = falcon.HTTP_200
             resp.content_type = 'text/html'
             resp.body = template.render(data = data)
