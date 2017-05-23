@@ -94,9 +94,7 @@ def libs(args):
 
 
 def test(args):
-    type = args.split(",")[0]
-    element = args.split(",")[1]
-    print(controller.test(type, element))
+    print(controller.test())
 
 
 def htop(args):

@@ -16,6 +16,7 @@ from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
 from icaro.core.connectors.machine import Machine
 from icaro.validator.main import Validator
+from testing import Test
 
 class Controller:
     def __init__(self):
@@ -153,8 +154,8 @@ class Controller:
         for element in self.virtualarea.get_all_elements():
             element.run_all_versions()
 
-    def test(self, type, elementName):
-        testing.test(self, type, elementName)
+    def test(self):
+        Test(self).run()
 
     def upgrade(self, type, elementName):
         """Upgrade element current version"""
