@@ -93,7 +93,7 @@ def libs(args):
     print(controller.libs(type, element))
 
 
-def test(args):
+def test():
     print(controller.test())
 
 

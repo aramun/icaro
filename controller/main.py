@@ -155,7 +155,7 @@ class Controller:
             element.run_all_versions()
 
     def test(self):
-        Test(self).run()
+        Test(self).start()
 
     def upgrade(self, type, elementName):
         """Upgrade element current version"""
