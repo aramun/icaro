@@ -7,7 +7,7 @@ from threading import Timer
 class Session:
     def __init__(self, req, resp, generate=False, in_memory=True, timeout=10):
         self.resp = resp
-        self.addr = "http://172.17.0.1:5000"
+        self.addr = "http://127.0.0.1:5000"
         self.in_memory = in_memory
         self.data = {}
         self.timeout = timeout

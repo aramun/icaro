@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 from icaro.core.virtualarea.element import Element
+import icaro.caching as caching
 import icaro.core.utils as utils
 
 class Test:
@@ -11,7 +12,7 @@ class Test:
         utils.mkDir("logs")
         os.system("pkill uwsgi")
 
-    def _run(self):
+    def __run(self):
         port = 8000
         for element in self.controller.virtualarea.get_all_elements():
             config = {}
@@ -24,7 +25,7 @@ class Test:
             element.test(str(port))
             port += 1
 
-    def _config_local_server(self,config, port):
+    def __config_local_server(self,config, port):
         server = "server{\n"
         server += """
         listen """+port+""" default_server\n;
@@ -34,6 +35,8 @@ class Test:
             if element["type"] == "apis":
                 server += "location /api/"+element["name"]+"/"+element["version"]+" {\n"
             else:
+                if element["name"] == "index":
+                    element["name"] = ""
                 server += "location /"+element["name"]+" {"
             server += "\nproxy_pass http://"+element["addr"]+":"+element["port"]+"/;\n"
             server += """proxy_set_header Host $http_host;proxy_set_header X-Real-IP $remote_addr;\nproxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\nproxy_set_header X-Forwarded-Proto $scheme;"""
@@ -41,15 +44,16 @@ class Test:
         server += "}"
         return server
             
-
-    def nginx_config(self):
+    def __nginx_config(self):
         settings = self.controller.settings
         port = raw_input("Insert port test: ")
-        config = self._config_local_server(self.test_report, port)
+        config = self.__config_local_server(self.test_report, port)
         utils.fileWrite(settings["nginx_path"]+"/sites-enabled/test-"+settings["project_name"], config)
 
     def start(self):
-        self._run()
+        self.__run()
         print self.test_report
-        self.nginx_config()
+        self.__nginx_config()
+        if os.fork() != 0:
+            os.system("uwsgi --enable-threads --http-socket 0.0.0.0:5000 --wsgi-file "+os.path.dirname(caching.__file__)+"/manager.py --callable api --logto 127.0.0.1:1717")
         os.system("service nginx restart")
