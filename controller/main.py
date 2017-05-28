@@ -24,7 +24,7 @@ class Controller:
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
-        
+ 
 
     def __build_env(self):
         if self.settings["session_engine"] == "icaro":
@@ -81,13 +81,15 @@ class Controller:
         Nginx(self.virtualarea, built).build()
         return built
 
-    def build(self, container):
+    def build(self, containerName):
         """
-        Input -> Node obj
+        Input -> containerName
         Output -> json built
         Scope:
             Build a single container creating monitor and building nginx
         """
+
+        container = self.virtualarea.get_container_by_name(containerName)
         Validator().machine(self.settings["machines"])
         self.__tree_build()
         built = self.run_container()

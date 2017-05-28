@@ -44,6 +44,18 @@ class Virtualarea:
                     nodes += Node(self, container.container, 0).get_nodes()
         return nodes
 
+    def get_container_by_name(self, containerName, nodes = False):
+        nodes_struct = None
+        for container in self.containers:
+            if container["name"] == containerName:
+                if nodes:
+                    for node in range(0, container["nodes"]):
+                        nodes_struct = []
+                        nodes_struct.append(Node(self, container, node))
+                else:
+                    nodes_struct = Node(self, container, 0)
+        return nodes_struct
+
     def get_all_elements(self):
         """Returns all element's object in the project """
         elements = []
