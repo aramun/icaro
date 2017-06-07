@@ -10,9 +10,8 @@ def my_action():
 
 class Root:
 	def on_get(self, req, resp):
-		if security.api(req, "127.0.0.1"):
+		if security.api(req, None):
 			role = "all"
-			template = render.load_template(role, page, libraries)
 			resp.status = falcon.HTTP_200
 			resp.content_type = 'application/json'
 			resp.body = json.dumps(my_action())

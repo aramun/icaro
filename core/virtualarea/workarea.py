@@ -16,7 +16,7 @@ class Workarea:
                             }
         self.elements = virtualarea.get_all_elements()
 
-    def gen_widget(self, name): 
+    def gen_widget(self, name):
 	utils.mkDir("widgets/" + name)
 	utils.mkDir("widgets/" + name + "/css")
 	utils.mkDir("widgets/" + name + "/js")

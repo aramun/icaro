@@ -21,9 +21,10 @@ def build(containerName):
     print("Build Success!")
     os.system("chmod -R 777 .")
     os.system("service nginx restart")
-    os.system("uwsgi --udp 0.0.0.0:1717")
-    controller.run(containerName)
-
+    if os.fork() == 0:
+        os.system("uwsgi --udp 0.0.0.0:1717")
+    controller.run_all_in_container(containerName)
+    
 
 def upgrade(args):
     type = args.split(",")[0]

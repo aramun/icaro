@@ -79,7 +79,7 @@ class Container:
         return self.name
 
     def htop(self):
-        container = client.containers.get(self.name)
+        container = self.client.containers.get(self.name)
         top = container.top(ps_args="aux")
         processes = []
         for process in top["Processes"]:
