@@ -24,7 +24,6 @@ class Controller:
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
- 
 
     def __build_env(self):
         if self.settings["session_engine"] == "icaro":
