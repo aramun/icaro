@@ -131,3 +131,8 @@ def copytree(source, destination):
 
 def getHome():
     return os.path.expanduser("~")
+
+def mvn_call(args):
+    """Call maven passing args as argument"""
+    os.system("mvn " + args)
+    

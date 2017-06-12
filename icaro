@@ -155,6 +155,9 @@ def clean(args):
     type = args.split(",")[0]
     controller.clean(type)
 
+def create_mvn_api(apiName, packageName):
+    utils.mvn_call("mvn archetype:generate -DgroupId=" + packageName + " -DartifactId=" = apiName + " -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false")
+    utils.importer(os.path.abspath(os.path.join(utils.selfLocation(), os.pardir)) + "/prefactor/"+ lang +"/apis.java","main/java/" + packageName + "/")
 
 def prepare_cli():
     cli = utils.readLines(os.path.dirname(os.path.abspath(icaro.cli.__file__))+"/cli.json")
