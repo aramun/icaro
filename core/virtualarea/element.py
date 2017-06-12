@@ -104,10 +104,9 @@ class Element:
         for version in self.versions:
             self.get_version(version).shut()
 
-    def test(self):
+    def test(self, port):
         """Run in localhost my version"""
-        port = raw_input("Insert port to run: ")
-        command = "uwsgi --enable-threads --http-socket 0.0.0.0:" + port + " --wsgi-file " + self.type + "/"+ self.name + "/" + self.name + ".py --callable api"
+        command = "uwsgi --enable-threads --http-socket 0.0.0.0:" + port + " --wsgi-file " + self.type + "/"+ self.name + "/" + self.name + ".py --callable api --daemonize logs/"+self.name+".log"
         return subprocess.Popen(command.split(" "), stdout=subprocess.PIPE).communicate()[0]
 
     def gen_folders(self):

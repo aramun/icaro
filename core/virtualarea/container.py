@@ -39,7 +39,7 @@ class Container:
             return self.__remote_run()
 
     def __local_run(self):
-        self.clean_image()
+        #self.clean_image()
         self.image = self.build()
         self.image.tag(self.name.lower(), "on-build")
         containerDocker = self.client.containers.run(self.image.id,
@@ -79,7 +79,7 @@ class Container:
         return self.name
 
     def htop(self):
-        container = client.containers.get(self.name)
+        container = self.client.containers.get(self.name)
         top = container.top(ps_args="aux")
         processes = []
         for process in top["Processes"]:

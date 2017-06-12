@@ -16,6 +16,7 @@ from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
 from icaro.core.connectors.machine import Machine
 from icaro.validator.main import Validator
+from testing import Test
 
 class Controller:
     def __init__(self):
@@ -23,7 +24,6 @@ class Controller:
         self.virtualarea = Virtualarea(self.settings)
         self.monitor = Monitor(self.virtualarea)
         self.workarea = Workarea(self.virtualarea)
-        
 
     def __build_env(self):
         if self.settings["session_engine"] == "icaro":
@@ -80,19 +80,22 @@ class Controller:
         Nginx(self.virtualarea, built).build()
         return built
 
-    def build(self, container):
+    def build(self, containerName):
         """
-        Input -> Node obj
+        Input -> containerName
         Output -> json built
         Scope:
             Build a single container creating monitor and building nginx
         """
+        container = self.virtualarea.get_container_by_name(containerName)
         Validator().machine(self.settings["machines"])
         self.__tree_build()
-        built = self.run_container()
-        self.run(container)
-        self.monitor.update(built)
-        Nginx(self.virtualarea, self.monitor.get()).build()
+        built = self.run_container(container)
+        if self.monitor.get():
+            self.monitor.update(built)
+        else:
+            self.monitor.create(built)
+        Nginx(self.virtualarea, built).build()
         return built
 
     def whereismyelement(self, type, elementName):
@@ -138,6 +141,16 @@ class Controller:
         self.workarea.gen_files()
         return "Update -> OK"
 
+    def htop(self, containerName):
+        """
+        Show process and performance of a container
+        """
+        node = containerName.split("-").pop()
+        containerName = containerName.split("-")[:-1]
+        containerName = "-".join(containerName)
+        container = self.virtualarea.get_container_by_name(containerName)
+        return Container(self.settings["project_name"], self.virtualarea, container, node, "local").htop()
+
     def clean(self, type):
         """
         Hard => clean virtual area and all containers
@@ -148,13 +161,17 @@ class Controller:
         elif type == "soft":
             os.system("rm -rf "+self.virtualarea.path)
 
+    def run_all_in_container(self, containerName):
+        for element in self.virtualarea.get_container_node_by_name(containerName).get_all_obj_elements():
+            element.run_all_versions()
+
     def run_all(self):
         self.__build_env()
         for element in self.virtualarea.get_all_elements():
             element.run_all_versions()
 
-    def test(self, type, elementName):
-        testing.test(self, type, elementName)
+    def test(self):
+        Test(self).start()
 
     def upgrade(self, type, elementName):
         """Upgrade element current version"""
