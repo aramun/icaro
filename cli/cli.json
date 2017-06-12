@@ -1,0 +1,76 @@
+{
+    "description":"Icaro Framework Dev-Version",
+    "args":{
+        "createProject":{
+            "description": "Create a project with settings file prefactor"
+        },
+        "build":{
+            "description":"Build action",
+            "args":{
+                "all":{
+                    "description": "Build all containers in your settings"
+                }
+            }
+        },
+        "update":{
+            "description":"Update workarea based on settings file",
+            "args":{
+            }
+        },
+        "current":{
+            "description":"Update workarea based on settings file",
+            "args":{
+                "pages":{"args":{}},
+                "apis":{"args":{}}
+            }
+        },
+        "versions":{
+            "description":"Update workarea based on settings file",
+            "args":{
+                "pages":{"args":{}},
+                "apis":{"args":{}}
+            }
+        },
+        "checkout":{
+            "description":"Update workarea based on settings file",
+            "args":{
+                "pages":{"args":{}},
+                "apis":{"args":{}}
+            }
+        },
+        "addversion":{
+            "description":"Add version to a element",
+            "args":{
+                "pages":{"args":{}},
+                "apis":{"args":{}}
+            }
+        },
+        "libs":{
+            "description":"Update workarea based on settings file ",
+            "args":{
+                "pages":{"args":{}},
+                "apis":{"args":{}}
+            }
+        },
+        "test":{
+            "description":"Update workarea based on settings file",
+            "args":{
+            }
+        },
+        "htop":{
+            "description":"Get container's tasks list",
+            "args":{
+            }
+        },
+        "check_machines":{
+            "description":"Check if remote machines are configured properly"
+        },
+        "whereismyelement":{
+            "description":"Track element into containers",
+            "args":{
+                "pages":{"args":{}}
+            }
+            
+        }
+    }
+}
