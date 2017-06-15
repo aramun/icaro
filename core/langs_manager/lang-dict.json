@@ -1,12 +1,20 @@
 {
     "python":{
+        "extension":"py",
         "docker_images":["python:2.7-onbuild"],
         "library_manager":"pip",
         "run_command":"uwsgi --enable-threads --http-socket 0.0.0.0:{port} --wsgi-file {path}{name}.py --callable api --logto 172.17.0.1:1717"
     },
     "java":{
+        "extension":"jar",
         "docker_images":["java:8"],
         "library_manager":"maven",
         "run_command":"java -Dserver.port={port} -jar {path}{name}.jar"
+    },
+    "ruby":{
+        "extension":"rb",
+        "docker_images":["ruby:2.1-onbuild"],
+        "library_manager":"gem",
+        "run_command":"echo -e \"require '{path}{name}'\nrun {class}.new\" > config.ru && rackup -p {port}"
     }
 }

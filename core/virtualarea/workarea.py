@@ -1,5 +1,6 @@
 import icaro.core.utils as utils
 import os
+from icaro.core.langs_manager.lang import Lang
 
 #imlemtare cartella per ogni api
 
@@ -42,9 +43,10 @@ class Workarea:
             self.gen_tree(self.folder_tree[folder], folder)
 
     def gen_file(self, name, type, lang):
-        path = type + "/" + name + "/" + name + ".py"
+        extension = Lang(lang).lang["extension"]
+        path = type + "/" + name + "/" + name + "." + extension
         if not os.path.isfile(path):
-            utils.importer(os.path.abspath(os.path.join(utils.selfLocation(), os.pardir)) + "/prefactor/"+ lang +"/"+ type + ".py", path)
+            utils.importer(os.path.abspath(os.path.join(utils.selfLocation(), os.pardir)) + "/prefactor/" + lang + "/" + type + "." + extension, path)
 
     def gen_files(self):
         for element in self.elements:

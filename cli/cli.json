@@ -1,11 +1,14 @@
 {
     "description":"Icaro Framework Dev-Version",
     "args":{
-        "createProject":{
-            "description": "Create a project with settings file prefactor"
+        "new":{
+            "description": "Create a project with settings file prefactor",
+            "args":{
+                 "<project name>": {}
+            }
         },
         "build":{
-            "description":"Build action",
+            "description":"Build a container",
             "args":{
                 "all":{
                     "description": "Build all containers in your settings"
@@ -13,26 +16,27 @@
             }
         },
         "update":{
-            "description":"Update workarea based on settings file",
-            "args":{
-            }
+            "description":"Update workarea based on settings file"
+        },
+        "config_machines":{
+            "description":"Connect remote machines to permits user to export container"
         },
         "current":{
-            "description":"Update workarea based on settings file",
+            "description":"Show element's current version",
             "args":{
                 "pages":{"args":{}},
                 "apis":{"args":{}}
             }
         },
         "versions":{
-            "description":"Update workarea based on settings file",
+            "description":"Show all element's versions",
             "args":{
                 "pages":{"args":{}},
                 "apis":{"args":{}}
             }
         },
         "checkout":{
-            "description":"Update workarea based on settings file",
+            "description":"Import in workarea an element",
             "args":{
                 "pages":{"args":{}},
                 "apis":{"args":{}}
@@ -46,16 +50,20 @@
             }
         },
         "libs":{
-            "description":"Update workarea based on settings file ",
+            "description":"Manage your client library",
             "args":{
-                "pages":{"args":{}},
-                "apis":{"args":{}}
+                "install":{"args":{
+                    "<git url>":{}
+                    }
+                },
+                "search":{"args":{
+                    "<query search>":{}
+                    }
+                }
             }
         },
         "test":{
-            "description":"Update workarea based on settings file",
-            "args":{
-            }
+            "description":"Run all platform on localhost"
         },
         "htop":{
             "description":"Get container's tasks list",
@@ -68,9 +76,9 @@
         "whereismyelement":{
             "description":"Track element into containers",
             "args":{
-                "pages":{"args":{}}
+                "pages":{"args":{}},
+                "apis":{"args":{}}
             }
-            
         }
     }
 }

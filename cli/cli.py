@@ -10,21 +10,32 @@ class Cli:
             print "Commands:\n"+self.__print_arguments()
         for i in range(1,len(sys.argv)):
             arg = sys.argv[i]
-            if arg in self.config["args"]:
-                self.config = self.config["args"][arg]
-                if i+1 == len(sys.argv):
-                    if "description" in self.config:
-                        print self.__header_message(self.config["description"])
-                if not self.config or "args" not in self.config:
-                    if len(sys.argv[1:]) > i:
-                        print self.__fatal_message("Too much arguments!!")
-                        sys.exit()
-                    return
-                else:
-                    if i == len(sys.argv[1:]):
-                        self.__insufficent_argument()
+            self.__handle_arg(arg, i)
+            
+    def __handle_arg(self, arg, i):
+        """i = argument index"""
+        def handle(arg):
+            print arg
+            self.config = self.config["args"][arg]
+            if i+1 == len(sys.argv):
+                if "description" in self.config:
+                    print self.__header_message(self.config["description"])
+            if not self.config or "args" not in self.config:
+                if len(sys.argv[1:]) > i:
+                    print self.__fatal_message("Too much arguments!!")
+                    sys.exit()
+                return
             else:
-                self.__wrong_argument()
+                if i == len(sys.argv[1:]):
+                    self.__insufficent_argument()
+        if arg in self.config["args"]:
+            handle(arg)
+        else:
+            for permitted in self.config["args"]:
+                if permitted[0] == "<" and permitted[-1] == ">":
+                    handle(permitted)
+                    return
+            self.__wrong_argument()
 
     def bcolor(self, color):
         colors = {
@@ -54,7 +65,7 @@ class Cli:
 
     def __get_redundance(self, arg):
         redundance = ["\t","\t","\t","\t"]
-        for i in range(0, int(len(arg)/8)):
+        for i in range(0, int(len(arg)/5)):
             redundance.pop()
         return "".join(redundance)
 

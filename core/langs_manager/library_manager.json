@@ -1,8 +1,11 @@
 {
-"pip":{
-    "requirements_file":"requirements.txt"
-},
-"maven":{
-    "requirements_file":"pom.xml"
-}
+    "pip":{
+        "requirements_file":"requirements.txt"
+    },
+    "maven":{
+        "requirements_file":"pom.xml"
+    },
+    "gem":{
+        "requirements_file":"Gemfile.lock"
+    }
 }
