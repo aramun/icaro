@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# PYTHON_ARGCOMPLETE_OK
 import sys
 import json
 import os
@@ -13,6 +12,7 @@ import inspect
 try:
     controller = Controller()
 except Exception as e:
+    controller = None
     print "No settings file present on the current dir"
 
 
@@ -142,22 +142,37 @@ def update():
     print(controller.update())
 
 
+def new(project_name):
+    import icaro
+    file = os.path.dirname(os.path.abspath(icaro.__file__)) + "/prefactor/settings.json"
+    content = json.loads(utils.readLines(file))
+    content["project_name"] = project_name
+    utils.createFolder(project_name)
+    utils.fileWrite(project_name + "/settings.json", json.dumps(content, indent=4))
+
+
 def clean(args):
     type = args.split(",")[0]
     controller.clean(type)
 
+
 def prepare_cli():
     cli = utils.readLines(os.path.dirname(os.path.abspath(icaro.cli.__file__))+"/cli.json")
     cli = json.loads(cli)
-    for element in controller.virtualarea.get_all_elements():
-        cli["args"]["versions"]["args"][element.name] = {}
-    for container in controller.virtualarea.get_containers():
-        cli["args"]["build"]["args"][container.name] = {"description": "Build container with name "+container.name}
-        cli["args"]["htop"]["args"][container.name] = {"description": "htop on "+container.name}
+    dynamic_arg_commands_element = ['whereismyelement', 'versions', 'checkout', 'current', 'addversion']
+    dynamic_arg_commands_container = ['htop', 'build']
+    if controller:
+        for element in controller.virtualarea.get_all_elements():
+            for command in dynamic_arg_commands_element:
+                cli["args"][command]["args"][element.type]["args"][element.name] = {}
+        for container in controller.virtualarea.get_containers():
+            for command in dynamic_arg_commands_container:
+                cli["args"][command]["args"][container.name] = {}
     return cli
 
 import icaro.cli
-Cli(prepare_cli())
+cli_conf = prepare_cli()
+Cli(cli_conf)
 sys.argv.pop(0)
 if len(sys.argv) > 1:
     print getattr(sys.modules[__name__], sys.argv[0])(",".join(sys.argv[1:]))
