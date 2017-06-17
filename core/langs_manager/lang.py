@@ -11,8 +11,8 @@ class Lang:
 
     def run_command(self, port, path, name):
         cmd = self.lang["run_command"]
-        cmd.replace("{port}", port)
-        cmd.replace("{path}", path)
-        cmd.replace("{name}", name)
-        cmd.replace("{class}", name.capitalize())
+        cmd = cmd.replace("{port}", port)
+        cmd = cmd.replace("{path}", path)
+        cmd = cmd.replace("{name}", name)
+        cmd = cmd.replace("{class}", name.capitalize())
         return cmd

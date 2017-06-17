@@ -34,7 +34,6 @@ class Monitor:
     def find_element(self, containerName, elementName):
         elements = []
         monitor = self.get()
-        print monitor
         for node in monitor[containerName]:
             for element in node["elements"]:
                 if elementName == element["name"]:

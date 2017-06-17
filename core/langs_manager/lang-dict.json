@@ -11,10 +11,10 @@
         "library_manager":"maven",
         "run_command":"java -Dserver.port={port} -jar {path}{name}.jar"
     },
-    "ruby":{
-        "extension":"rb",
-        "docker_images":["ruby:2.1-onbuild"],
-        "library_manager":"gem",
-        "run_command":"echo -e \"require '{path}{name}'\nrun {class}.new\" > config.ru && rackup -p {port}"
+    "ruby": {
+        "extension": "rb",
+        "docker_images": ["ruby:2.1"],
+        "library_manager": "gem",
+        "run_command": "echo -e \"require '{name}'\nrequire 'rubygems'\nrequire 'bundler'\nBundler.require\nrun Api.new\" > config.ru && rackup -p {port}"
     }
 }

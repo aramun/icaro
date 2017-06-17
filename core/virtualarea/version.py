@@ -17,10 +17,11 @@ class Version:
     def run(self):
         """Run element version"""
         client = docker.from_env(version='auto')
-        print "Runnning " + self.element.name + "v" + self.version + " node " + self.node.name + "..."
-        cmd = "uwsgi --enable-threads --http-socket 0.0.0.0:" + str(self.get_port()) + " --wsgi-file " + self.remote_path + self.element.name + ".py --callable api --logto 172.17.0.1:1717"
+        cmd = self.element.lang.run_command(str(self.get_port()), self.remote_path, self.element.name)
+        last_cmd = cmd.split("&&").pop().strip(" ")
         container = client.containers.get(self.node_name)
-        self.shut(cmd)
+        self.shut(last_cmd)
+        print "Runnning " + self.element.name + "v" + self.version + " node " + self.node.name + "..."
         container.exec_run(cmd, stream = True, detach=True)
 
     def set_port(self, port):

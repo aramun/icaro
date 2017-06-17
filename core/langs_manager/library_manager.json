@@ -6,6 +6,6 @@
         "requirements_file":"pom.xml"
     },
     "gem":{
-        "requirements_file":"Gemfile.lock"
+        "requirements_file":"Gemfile"
     }
 }

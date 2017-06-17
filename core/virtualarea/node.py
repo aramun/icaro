@@ -103,9 +103,10 @@ class Node:
             langs.append(Lang(lang))
         return langs
 
-    def create_requirements(self):
-        for lang in self.get_all_langs_object():
-            utils.fileWrite(self.path + lang.requirements_file, packages.lib(self.packages))
+    def create_requirements(self):#when you will add a second custom lib will be overwritten --> to fix
+        for package in packages.lib(self.packages):
+            lang = Lang(package["lang"])
+            utils.fileWrite(self.path + lang.requirements_file, package["content"])
 
     def controller(self):
         key = str(uuid.uuid4())

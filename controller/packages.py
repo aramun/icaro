@@ -12,27 +12,26 @@ def pack_libs(libs):
 def dockerfile(packages):
     result = ""
     for package in packages:
-        module = importlib.import_module('icaro.packages.' + package)
+        module = importlib.import_module('icaro.packages.'+package["lang"]+"."+package["package"])
         result += module.dockerfile()
     return result
 
 def include(packages, destination):
-    print destination
     for package in packages:
-        module = importlib.import_module('icaro.packages.' + package)
+        module = importlib.import_module('icaro.packages.'+package["lang"] + "." + package["package"])
         module.include(destination)
 
 def lib(packages):
-    result = ""
+    result = []
     for package in packages:
-        module = importlib.import_module('icaro.packages.' + package)
-        result += module.lib()
+        module = importlib.import_module('icaro.packages.' + package["lang"] + "." + package["package"])
+        result.append({"lang": package["lang"], "content": module.lib()})
     return result
 
 def commands(packages):
-    result = ""
+    result =  ""
     for package in packages:
-        module = importlib.import_module('icaro.packages.' + package)
+        module = importlib.import_module('icaro.packages.' + package["lang"] + "." + package["package"])
         for command in module.commands():
             result += "CMD " + json.dumps(command.split(" ")) + "\r\n"
     return result
