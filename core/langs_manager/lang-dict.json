@@ -15,6 +15,6 @@
         "extension": "rb",
         "docker_images": ["ruby:2.1"],
         "library_manager": "gem",
-        "run_command": "echo -e \"require '{name}'\nrequire 'rubygems'\nrequire 'bundler'\nBundler.require\nrun Api.new\" > config.ru && rackup -p {port}"
+        "run_command": "echo -e \"require './{name}'\nrun Api.new\" > {path}config.ru && rackup -p {port}"
     }
 }

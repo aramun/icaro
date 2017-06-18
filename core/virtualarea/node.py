@@ -14,7 +14,8 @@ class Node:
         self.counter = container["nodes"]
         self.dir = virtualarea.path
         self.settings = virtualarea.settings
-        self.name = container["name"] + "-" + str(node)
+        self.base_name = container["name"]
+        self.name = self.base_name + "-" + str(node)
         self.path = virtualarea.path + self.name + '/'
         self.container = container
         self.proxy = virtualarea.proxy

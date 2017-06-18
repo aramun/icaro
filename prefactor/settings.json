@@ -29,7 +29,9 @@
     },
     "containers": [
         {
-	    "packages":["default"],
+	    "packages":[
+            {"lang":"python", "package":"default"}
+        ],
             "apis": [
                 {
                     "cache_profile": "default_cache", 
@@ -53,7 +55,7 @@
                     "versions":["1.3", "1.5"],
                     "current_version": "1.5"
                 }
-            ], 
+            ],
             "cpu_limit": "",
             "machine": "local", 
             "memory_limit": "500m", 
@@ -71,7 +73,9 @@
             ]
         }, 
         {
-	    "packages":["default"],
+	    "packages":[
+            {"lang":"python", "package":"default"}
+        ],
             "apis": [
                 {
                     "cache_profile": "default_cache", 

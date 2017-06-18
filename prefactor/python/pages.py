@@ -34,7 +34,7 @@ libraries = {
     ]
 }
 
-def getData():
+def get_data(session):
     data = {}
     data["role"] = "all"#-> call at auth api
     data["username"] = "all"

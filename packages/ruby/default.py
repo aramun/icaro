@@ -12,10 +12,10 @@ def include(destination):
         shutil.copyfile(icaro_dir + "/core/__init__.py", destination + "/icaro/icaro/core/__init__.py")
 
 def dockerfile():
-    return "COPY icaro /usr/local/lib/python2.7/site-packages\n"
+    return "COPY icaro /usr/local/lib/python2.7/site-packages\nRUN apt-get update\nRUN apt-get install -y ruby-rack\nRUN gem install nancy\n"
 
 def lib():
-    return "gem 'nancy'"
+    return "source 'https://rubygems.org'\ngem 'nancy'"
 
 def commands():
     return []

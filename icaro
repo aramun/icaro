@@ -159,14 +159,17 @@ def prepare_cli():
     cli = utils.readLines(os.path.dirname(os.path.abspath(icaro.cli.__file__))+"/cli.json")
     cli = json.loads(cli)
     dynamic_arg_commands_element = ['whereismyelement', 'versions', 'checkout', 'current', 'addversion']
-    dynamic_arg_commands_container = ['htop', 'build']
+    dynamic_arg_commands_container = ['build']
+    dynamic_arg_commands_nodes = ['htop']
     if controller:
         for element in controller.virtualarea.get_all_elements():
             for command in dynamic_arg_commands_element:
                 cli["args"][command]["args"][element.type]["args"][element.name] = {}
         for container in controller.virtualarea.get_containers():
-            for command in dynamic_arg_commands_container:
+            for command in dynamic_arg_commands_nodes:
                 cli["args"][command]["args"][container.name] = {}
+            for command in dynamic_arg_commands_container:
+                cli["args"][command]["args"][container.base_name] = {}
     return cli
 
 import icaro.cli

@@ -23,7 +23,7 @@ class Workarea:
 	utils.mkDir("widgets/" + name + "/js")
 	utils.mkDir("widgets/" + name + "/images")
 	if not os.path.isfile("widgets/" + name + "/index.html"):
-	    utils.fileWrite("widgets/" + name + "/index.html","<!-- Write your widget... -->")
+	    utils.fileWrite("widgets/" + name + "/index.html","<h1>icaro "+name+"</h1>")
 	if not os.path.isfile("widgets/" + name + "/css/style.css"):
 	    utils.fileWrite("widgets/" + name + "/css/style.css","//widget css rules...")
 	if not os.path.isfile("widgets/" + name + "/js/main.js"):
