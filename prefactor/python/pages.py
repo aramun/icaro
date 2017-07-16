@@ -2,8 +2,8 @@ import falcon
 import json
 import os
 import requests
-from icaro.render import Lib
-import icaro.render as render
+from icaro.render.python.render import Lib
+import icaro.render.python.render as render
 from icaro.session.manager import Session
 import icaro.utils.security as security
 import icaro.core.utils as utils

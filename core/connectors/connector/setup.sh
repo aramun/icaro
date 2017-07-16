@@ -1,4 +1,5 @@
 apt-get update
+apt-get install nginx-full
 apt-get install python-pip
 apt-get install docker-engine
 apt-get install docker.io

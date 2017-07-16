@@ -16,6 +16,7 @@ from icaro.core.virtualarea.monitor import Monitor
 from icaro.core.nginx.main import Nginx
 from icaro.core.connectors.machine import Machine
 from icaro.validator.main import Validator
+from icaro.controller.deployment import EnvController
 from testing import Test
 
 class Controller:
@@ -123,6 +124,9 @@ class Controller:
     def __config_machine(self, machine_name, machine):
         machine = Machine(machine, machine_name)
         machine.configure(self.settings["server_addr"])
+    
+    def commit_settings(self):
+        utils.fileWrite("settings.json", json.dumps(self.settings))
 
     def config_machines(self):
         """
@@ -150,6 +154,12 @@ class Controller:
         containerName = "-".join(containerName)
         container = self.virtualarea.get_container_by_name(containerName)
         return Container(self.settings["project_name"], self.virtualarea, container, node, "local").htop()
+
+    def env(self, action, name, secondEnv = None):
+        """
+        Enviroment commands
+        """
+        EnvController(self, action, name, secondEnv)
 
     def clean(self, type):
         """

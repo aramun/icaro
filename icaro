@@ -4,6 +4,7 @@ import os
 import icaro.core.utils as utils
 from icaro.controller.main import Controller
 from icaro.controller.versioning import VersionController
+from icaro.controller.deployment import EnvController
 import icaro.caching as caching
 from icaro.cli.cli import Cli
 import inspect
@@ -116,6 +117,12 @@ def addversion(args):
     element = args.split(",")[1]
     version = args.split(",")[2]
     print(VersionController(controller.virtualarea, type, element).addversion(version))
+
+
+def env(args):
+    action = args.split(",")[0]
+    name = args.split(",")[1]
+    print(controller.env(action, name))
 
 
 def libs(args):

@@ -123,6 +123,8 @@
     "db_password":"",
     "db_host":"",
     "db_port":9000,
+    "current_env":"dev",
+    "envs":["dev", "prod"],
     "proxy":{
     	"http": "",
         "https": "",
