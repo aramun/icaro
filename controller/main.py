@@ -44,7 +44,7 @@ class Controller:
 
     def libs(self, command, query):
         return getattr(LibsController(self.virtualarea), command)(query)
-
+    
     def run_containers(self):
         containers = {}
         for container in self.virtualarea.containers:

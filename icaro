@@ -162,6 +162,18 @@ def clean(args):
     controller.clean(type)
 
 
+def add(args):
+    type = args.split(",")[0]
+    name = args.split(",")[1]
+    controller.add(type, name)
+
+
+def remove(args):
+    type = args.split(",")[0]
+    name = args.split(",")[1]
+    controller.remove(type, name)
+
+
 def prepare_cli():
     cli = utils.readLines(os.path.dirname(os.path.abspath(icaro.cli.__file__))+"/cli.json")
     cli = json.loads(cli)

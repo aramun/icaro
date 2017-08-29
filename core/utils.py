@@ -6,6 +6,7 @@ import tarfile
 import subprocess
 import sys
 import urlparse
+import traceback
 
 def ssh_execute(machine, command):
     bash = 'sshpass -p '+machine["password"]+' ssh -p'+str(machine["port"])+' '+machine["username"]+'@'+machine["addr"]+' '+command
@@ -131,3 +132,38 @@ def copytree(source, destination):
 
 def getHome():
     return os.path.expanduser("~")
+
+#--Static Body Defintion-----
+
+class BodyRequestTypeWrong(Exception):
+    def __init__(self, excepted_type, found_type):
+        traceback.print_exc()
+        print("Excepted type "+ excepted_type+", found type " + found_type.__name__)
+
+
+class BodyRequestVioletedLengthConstraint(Exception):
+    def __init__(self, excepted_length, found_length, key):
+        traceback.print_exc()
+        print("Key " + key + " max length excepted " + str(excepted_length) +", found length " + str(found_length))
+
+
+class BodyRequestWrongKey(Exception):
+    def __init__(self, key_found):
+        traceback.print_exc()
+        print("Wrong_key found " + key_found)
+
+
+def check_body(data, body_draft = None):
+    if body_draft:
+        for key, value in data.iteritems():
+            if key not in body_draft:
+                raise BodyRequestWrongKey(key)       
+            if len(value) > body_draft[key]["length"]:
+                raise BodyRequestVioletedLengthConstraint(body_draft[key]["length"], len(value), key)
+            if type(value).__name__ != body_draft[key]["type"]:
+                raise BodyRequestTypeWrong(body_draft[key]["type"], type(value))
+    return data
+
+
+def get_body(req, body_draft = None):
+    return check_body(urldecode(req.stream.read()), body_draft)
