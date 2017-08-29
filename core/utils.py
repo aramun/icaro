@@ -153,17 +153,75 @@ class BodyRequestWrongKey(Exception):
         print("Wrong_key found " + key_found)
 
 
-def check_body(data, body_draft = None):
+class UnknowStaticLevel(Exception):
+    def __init__(self, static_level_found):
+        traceback.print_exc()
+        print("Unknow static level specified: "+ static_level_found)
+
+class UnpermittedValue(Exception):
+    def __init__(self, key, value, permitted_val):
+        traceback.print_exc()
+        print("Unpermitted " + key + ": " + value + ", permitted values: ")
+        for val in permitted_val:
+            print val
+
+class WrongOrder(Exception):
+    def __init__(self, keys):
+        traceback.print_exc()
+        print("Wrong parameter order!! \n Correct Order: ")
+        for key in keys:
+            print key
+
+
+class MissingKeys(Exception):
+    def __init__(self, missing_keys):
+        traceback.print_exc()
+        print("Missing keys from structure: ")
+        for key in missing_keys:
+            print(key)
+
+
+def first_check(data, body_draft = None):
+    for key, value in data.iteritems():
+        if key not in body_draft:
+            raise BodyRequestWrongKey(key)
+        if len(value) > body_draft[key]["length"]:
+            raise BodyRequestVioletedLengthConstraint(body_draft[key]["length"], len(value), key)
+        if type(value).__name__ != body_draft[key]["type"]:
+            raise BodyRequestTypeWrong(body_draft[key]["type"], type(value))
+        if "permitted_val" in body_draft[key] and value not in body_draft[key]["permitted_val"]:
+            raise UnpermittedValue(key, value, body_draft[key]["permitted_val"])
+
+
+def second_check(data, body_draft = None):
+    pass
+
+
+def third_check(data, body_draft = None):
+    pass
+
+
+def check_body(data, body_draft = None, static_level = 1):
     if body_draft:
-        for key, value in data.iteritems():
-            if key not in body_draft:
-                raise BodyRequestWrongKey(key)       
-            if len(value) > body_draft[key]["length"]:
-                raise BodyRequestVioletedLengthConstraint(body_draft[key]["length"], len(value), key)
-            if type(value).__name__ != body_draft[key]["type"]:
-                raise BodyRequestTypeWrong(body_draft[key]["type"], type(value))
+        first_check(data, body_draft)
+    if static_level >= 2:
+        second_check(data, body_draft)
+    if static_level == 3:
+        third_check(data, body_draft)
     return data
 
 
-def get_body(req, body_draft = None):
-    return check_body(urldecode(req.stream.read()), body_draft)
+def get_body(req, body_draft = None, static_level = 1):
+    """
+    body_draft -> a structure of your body like this:
+        {
+        "key1": {"type": "str", "length": 50, "permitted_val": []},
+        "key2": {"type": "str", "length": 50}
+         ecc...
+        }
+    static_level:
+        1 -> make static only type, length and permitted_val
+        2 -> you must enter always all keys into body
+        3 -> the same of 2 + the order is static
+    """
+    return check_body(urldecode(req.stream.read()), body_draft, static_level)
